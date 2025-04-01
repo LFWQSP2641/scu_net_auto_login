@@ -224,6 +224,11 @@ std::string encryptedString(const RSAKeyPair &key, const std::string &s)
     return result;
 }
 
+RSAUtils::RSAUtils(QObject *parent)
+    : QThread {parent}
+{
+}
+
 QByteArray RSAUtils::encryptedPassword(QStringView password, QStringView mac)
 {
     const std::string eHex = "10001"; // 公钥常用值 65537 的十六进制表示
@@ -242,4 +247,17 @@ QByteArray RSAUtils::encryptedPassword(QStringView password, QStringView mac)
     std::string cipherText = encryptedString(key, plainText);
 
     return QByteArray::fromStdString(cipherText);
+}
+
+void RSAUtils::syncEncryptedPassword(const QString &password, const QString &mac)
+{
+    m_password = password;
+    m_mac = mac;
+    start();
+}
+
+void RSAUtils::run()
+{
+    m_encryptedPassword = encryptedPassword(m_password, m_mac);
+    emit encryptedPasswordReady(m_encryptedPassword);
 }

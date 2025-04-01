@@ -39,23 +39,21 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     // 检查必要参数
-    QTextStream out(stdout);
-
     if (!parser.isSet(usernameOption))
     {
-        out << "\033[1;91m[错误]\033[0m 必须提供用户名参数 (-u, --username)" << Qt::endl;
+        qWarning() << "\033[1;91m[错误]\033[0m 必须提供用户名参数 (-u, --username)" << Qt::endl;
         return 1;
     }
 
     if (!parser.isSet(passwordOption))
     {
-        out << "\033[1;91m[错误]\033[0m 必须提供密码参数 (-p, --password)" << Qt::endl;
+        qWarning() << "\033[1;91m[错误]\033[0m 必须提供密码参数 (-p, --password)" << Qt::endl;
         return 1;
     }
 
     if (!parser.isSet(serviceOption))
     {
-        out << "\033[1;91m[错误]\033[0m 必须提供服务类型参数 (-s, --service)" << Qt::endl;
+        qWarning() << "\033[1;91m[错误]\033[0m 必须提供服务类型参数 (-s, --service)" << Qt::endl;
         return 1;
     }
 
@@ -68,12 +66,18 @@ int main(int argc, char *argv[])
     QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
     if (!validServices.contains(service))
     {
-        out << "\033[1;91m[错误]\033[0m 无效的服务类型。请使用: CHINATELECOM, CHINAMOBILE, CHINAUNICOM, EDUNET" << Qt::endl;
+        qWarning() << "\033[1;91m[错误]\033[0m 无效的服务类型。请使用: CHINATELECOM, CHINAMOBILE, CHINAUNICOM, EDUNET" << Qt::endl;
         return 1;
     }
 
     Loginer loginer;
     loginer.login(username, password, service);
+
+    QObject::connect(&loginer, &Loginer::messageReceived, [](const QString &message)
+                     { qDebug() << "\033[1;92m[信息]\033[0m " << message << Qt::endl; });
+    QObject::connect(&loginer, &Loginer::errorOccurred, [](const QString &error)
+                     { qWarning() << "\033[1;91m[错误]\033[0m " << error << Qt::endl; });
+    QObject::connect(&loginer, &Loginer::loginFinished, &a, &QCoreApplication::quit);
 
     return a.exec();
 }
