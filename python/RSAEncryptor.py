@@ -179,8 +179,10 @@ def encryptedString(key, s):
         # 使用Barrett约简进行模幂运算
         crypt = key.barrett.powMod(block, key.e)
 
-        # 转换为十六进制
-        text = hex(crypt)[2:]
+        # 转换为十六进制，确保保留前导零
+        # 计算模数的十六进制长度，确保每个加密块有相同长度
+        modulus_hex_length = (key.m.bit_length() + 3) // 4
+        text = hex(crypt)[2:].zfill(modulus_hex_length)
         result.append(text)
 
     return " ".join(result)
@@ -222,14 +224,14 @@ def decryptedString(key, s):
 RSAUtils.setMaxDigits(130)
 
 
-def encryptedPassword(password):
+def encryptedPassword(password, mac):
     """
     加密密码
     :param password: 待加密的密码
     :return: 加密后的十六进制字符串
     """
     # 反转密码
-    password_reversed = (password + ">0bfcebc1be5b937b48e18b883800ee9a")[::-1]
+    password_reversed = (password + ">" + mac)[::-1]
 
     publicKeyExponent = "10001"  # 十六进制，等于65537
     modulus = "94dd2a8675fb779e6b9f7103698634cd400f27a154afa67af6166a43fc26417222a79506d34cacc7641946abda1785b7acf9910ad6a0978c91ec84d40b71d2891379af19ffb333e7517e390bd26ac312fe940c340466b4a5d4af1d65c3b5944078f96a1a51a5a53e4bc302818b7c9f63c4a1b07bd7d874cef1c3d4b2f5eb7871"
@@ -238,3 +240,7 @@ def encryptedPassword(password):
     # 加密
     encrypted = encryptedString(key, password_reversed)
     return encrypted
+
+
+if __name__ == "__main__":
+    print(encryptedPassword("011431", "eef900330a8987f0957c14c756513384"))

@@ -2,6 +2,7 @@ import requests
 import re
 from typing import Optional, Union
 import RSAEncryptor
+from urllib.parse import urlparse, parse_qs
 
 session = requests.Session()
 main_url = "http://192.168.2.135/"
@@ -83,11 +84,13 @@ def login(username: str, password: str, service: str) -> Union[str, int]:
 
     try:
         login_querystring = getQueryString()
+        # login_querystring query解析
+        parad = parse_qs(login_querystring)
 
         login_post_url = main_url + "eportal/InterFace.do?method=login"
         login_post_data = {
             "userId": username,
-            "password": RSAEncryptor.encryptedPassword(password),
+            "password": RSAEncryptor.encryptedPassword(password, parad["mac"][0]),
             "service": service_code,
             "queryString": login_querystring,
             "operatorPwd": "",
