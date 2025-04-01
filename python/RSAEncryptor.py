@@ -240,7 +240,3 @@ def encryptedPassword(password, mac):
     # 加密
     encrypted = encryptedString(key, password_reversed)
     return encrypted
-
-
-if __name__ == "__main__":
-    print(encryptedPassword("011431", "eef900330a8987f0957c14c756513384"))
