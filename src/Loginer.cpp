@@ -4,6 +4,7 @@
 
 #include <QEventLoop>
 #include <QNetworkAccessManager>
+#include <QNetworkCookieJar>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QRegularExpression>
@@ -56,7 +57,7 @@ void Loginer::login(const QString &username, const QString &password, const QStr
     if (m_serviceCode.isEmpty())
     {
         emit errorOccurred(QStringLiteral("不支持的服务商: ") + service);
-        emit loginFinished();
+        emit loginFailed();
         return;
     }
 
@@ -109,7 +110,7 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     if (!query)
     {
         emit errorOccurred(QStringLiteral("无法获取必要数据"));
-        emit loginFinished();
+        emit loginFailed();
     }
 
     const QUrl loginPostUrl(QStringLiteral("eportal/InterFace.do?method=login").prepend(mainUrl));
@@ -126,6 +127,7 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     loginPostData.addQueryItem(QStringLiteral("validcode"), {});
     loginPostData.addQueryItem(QStringLiteral("passwordEncrypt"), QStringLiteral("true"));
 
+    clearAllCookies();
     QNetworkReply *reply = netManager->post(request, loginPostData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, &QNetworkReply::finished, this, [this, reply]
             { this->onLoginRequestFinished(reply); });
@@ -140,13 +142,19 @@ void Loginer::resetTcpState()
     tcpContentLength = -1;
 }
 
+void Loginer::clearAllCookies()
+{
+    netManager->cookieJar()->deleteLater();
+    netManager->setCookieJar(new QNetworkCookieJar(this));
+}
+
 void Loginer::getRedirectInfo(QNetworkReply *reply)
 {
     const QUrl firstUrl = reply->url();
     if (firstUrl.toString().contains(QByteArrayLiteral("success.jsp")))
     {
         emit errorOccurred(QStringLiteral("已登录，无法在登录状态下获取必要数据"));
-        emit loginFinished();
+        emit loginSuccess();
         return;
     }
 
@@ -218,7 +226,7 @@ void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
 void Loginer::onTcpSocketTimeOut()
 {
     emit errorOccurred(QStringLiteral("请求超时"));
-    emit loginFinished();
+    emit loginFailed();
     socket->close();
 }
 
@@ -228,7 +236,7 @@ void Loginer::onTcpSocketDisconnected()
     if (!queryStr.has_value())
     {
         emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
-        emit loginFinished();
+        emit loginFailed();
         return;
     }
 
@@ -242,16 +250,22 @@ void Loginer::onTcpSocketDisconnected()
 
 void Loginer::onLoginRequestFinished(QNetworkReply *reply)
 {
-    const auto &replyData = reply->readAll();
+    const auto replyData = reply->readAll();
 
     if (replyData.contains(QByteArrayLiteral("\"result\":\"success\"")))
     {
         emit messageReceived(QStringLiteral("登录成功"));
+        emit loginSuccess();
+    }
+    else if (replyData.contains(QByteArrayLiteral("\"message\":\"验证码错误.\"")))
+    {
+        emit errorOccurred(QStringLiteral("触发风控").append(replyData));
+        emit loginFailed();
     }
     else
     {
-        emit errorOccurred(QStringLiteral("登录失败"));
+        emit errorOccurred(QStringLiteral("登录失败").append(replyData));
+        emit loginFailed();
     }
     reply->deleteLater();
-    emit loginFinished();
 }

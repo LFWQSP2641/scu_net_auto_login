@@ -31,6 +31,7 @@ protected slots:
     void getQuery();
     void sendLoginRequest(const QByteArray &encryptedPassword);
     void resetTcpState();
+    void clearAllCookies();
 
 private slots:
     void getRedirectInfo(QNetworkReply *reply);
@@ -65,5 +66,6 @@ signals:
     void messageReceived(const QString &message);
     void errorOccurred(const QString &error);
     void firstRedirectedFinished(QNetworkReply *reply);
-    void loginFinished();
+    void loginFailed();
+    void loginSuccess();
 };
