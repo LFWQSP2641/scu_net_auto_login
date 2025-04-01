@@ -11,17 +11,20 @@
 #include <QUrlQuery>
 
 Loginer::Loginer(QObject *parent)
-    : QObject {
-          parent  // ？什么byd格式化
-},
-      netManager {new QNetworkAccessManager {this}},
+    : QObject(parent),
+      netManager(new QNetworkAccessManager(this)),
       serviceCodeMap {
           {QStringLiteral("CHINATELECOM"), QByteArrayLiteral("%E7%94%B5%E4%BF%A1%E5%87%BA%E5%8F%A3")},
-          {QStringLiteral("CHINAMOBILE"), QByteArrayLiteral("%E7%A7%BB%E5%8A%A8%E5%87%BA%E5%8F%A3")},
-          {QStringLiteral("CHINAUNICOM"), QByteArrayLiteral("%E8%81%94%E9%80%9A%E5%87%BA%E5%8F%A3")},
-          {QStringLiteral("EDUNET"), QByteArrayLiteral("internet")},
-      },
-      mainUrl {QStringLiteral("http://192.168.2.135/")}, socket {new QTcpSocket(this)}, tcpTimeOutTimer {new QTimer(this)}, rsaUtils {new RSAUtils {this}}
+          {QStringLiteral("CHINAMOBILE"),  QByteArrayLiteral("%E7%A7%BB%E5%8A%A8%E5%87%BA%E5%8F%A3")},
+          {QStringLiteral("CHINAUNICOM"),  QByteArrayLiteral("%E8%81%94%E9%80%9A%E5%87%BA%E5%8F%A3")},
+          {QStringLiteral("EDUNET"),       QByteArrayLiteral("internet")                            },
+},
+      mainUrl(QStringLiteral("http://192.168.2.135/")),
+      socket(new QTcpSocket(this)),
+      tcpTimeOutTimer(new QTimer(this)),
+      rsaUtils(new RSAUtils(this)),
+      tcpHeaderComplete(false),
+      tcpContentLength(-1)
 {
     netManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
     netManager->setProxy(QNetworkProxy::NoProxy);
@@ -36,6 +39,7 @@ Loginer::Loginer(QObject *parent)
     connect(tcpTimeOutTimer, &QTimer::timeout, this, &Loginer::onTcpSocketTimeOut);
     connect(socket, &QTcpSocket::disconnected, this, &Loginer::onTcpSocketDisconnected);
     connect(rsaUtils, &RSAUtils::encryptedPasswordReady, this, &Loginer::sendLoginRequest);
+    connect(socket, &QTcpSocket::connected, this, &Loginer::resetTcpState);
 }
 
 Loginer::~Loginer()
@@ -65,6 +69,30 @@ void Loginer::setRequestHeaders(QNetworkRequest &request)
     request.setRawHeader("Accept-Encoding", "gzip, deflate, br");
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0");
+}
+
+std::optional<QString> Loginer::extractQueryString() const
+{
+    // 使用正则表达式提取queryString
+    static const QRegularExpression regex("/index\\.jsp\\?([^'\"\n]+)");
+    QRegularExpressionMatch match = regex.match(QString(tcpData));
+
+    if (match.hasMatch())
+    {
+        return match.captured(1);
+    }
+
+    // 回退到原来的方法
+    QString responseStr = QString(tcpData);
+    int start = responseStr.indexOf("/index.jsp?") + 11;
+    int end = responseStr.indexOf("'</script>");
+
+    if (start >= 11 && end > start)
+    {
+        return responseStr.mid(start, end - start);
+    }
+
+    return std::nullopt;
 }
 
 void Loginer::getQuery()
@@ -105,6 +133,13 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     emit messageReceived(QStringLiteral("正在登录。。。"));
 }
 
+void Loginer::resetTcpState()
+{
+    tcpData.clear();
+    tcpHeaderComplete = false;
+    tcpContentLength = -1;
+}
+
 void Loginer::getRedirectInfo(QNetworkReply *reply)
 {
     const QUrl firstUrl = reply->url();
@@ -117,16 +152,19 @@ void Loginer::getRedirectInfo(QNetworkReply *reply)
 
     reply->deleteLater();
 
-    socket->connectToHost(firstUrl.host(), 80);
+    m_redircetUrl = firstUrl.host().toUtf8();
+
+    socket->connectToHost(m_redircetUrl, 80);
 }
 
 void Loginer::onTcpSocketConnected()
 {
     // 手动构造 HTTP 请求，确保 Host 为大写
-    QString request = "GET / HTTP/1.1\r\n"
-                      "Host: 123.123.123.123\r\n"
-                      "\r\n";
-    socket->write(request.toUtf8());
+    const QByteArray request = QByteArrayLiteral("GET / HTTP/1.1\r\n"
+                                                 "Host: ")
+                                   .append(m_redircetUrl)
+                                   .append(QByteArrayLiteral("\r\n\r\n"));
+    socket->write(request);
     tcpTimeOutTimer->start(10000);
 }
 
@@ -186,45 +224,20 @@ void Loginer::onTcpSocketTimeOut()
 
 void Loginer::onTcpSocketDisconnected()
 {
-    // 使用正则表达式提取queryString，更加健壮
-    static const QRegularExpression regex("/index\\.jsp\\?([^'\"\n]+)");
-    QRegularExpressionMatch match = regex.match(QString(tcpData));
-
-    std::optional<QString> queryStr;
-
-    if (match.hasMatch())
+    auto queryStr = extractQueryString();
+    if (!queryStr.has_value())
     {
-        queryStr = match.captured(1);
-    }
-    else
-    {
-        // 回退到原来的方法
-        QString responseStr = QString(tcpData);
-        int start = responseStr.indexOf("/index.jsp?") + 11;
-        int end = responseStr.indexOf("'</script>");
-
-        if (start >= 11 && end > start)
-        {
-            queryStr = responseStr.mid(start, end - start);
-        }
-        else
-        {
-            emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
-            emit loginFinished();
-            return;
-        }
+        emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
+        emit loginFinished();
+        return;
     }
 
-    // 从optional<QString>转换为optional<QUrlQuery>
-    if (queryStr.has_value())
-    {
-        query = QUrlQuery(queryStr.value());
-        rsaUtils->syncEncryptedPassword(m_password, query->queryItemValue(QStringLiteral("mac")));
-        emit messageReceived(QStringLiteral("获取登录参数成功，加密密码中。。。"));
+    query = QUrlQuery(queryStr.value());
+    rsaUtils->syncEncryptedPassword(m_password, query->queryItemValue(QStringLiteral("mac")));
+    emit messageReceived(QStringLiteral("获取登录参数成功，加密密码中..."));
 #ifdef QT_DEBUG
-        emit messageReceived(QStringLiteral("Debug 模式时会特别慢"));
+    emit messageReceived(QStringLiteral("Debug 模式时会特别慢"));
 #endif
-    }
 }
 
 void Loginer::onLoginRequestFinished(QNetworkReply *reply)

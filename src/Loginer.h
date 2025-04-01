@@ -3,8 +3,10 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QObject>
+#include <QTcpSocket>
 #include <QTimer>
 #include <QUrlQuery>
+#include <optional>
 
 class QNetworkAccessManager;
 class RSAUtils;
@@ -23,10 +25,12 @@ public slots:
 protected:
     // std::optional<QUrlQuery> getQuery();
     static void setRequestHeaders(QNetworkRequest &request);
+    std::optional<QString> extractQueryString() const;
 
 protected slots:
     void getQuery();
     void sendLoginRequest(const QByteArray &encryptedPassword);
+    void resetTcpState();
 
 private slots:
     void getRedirectInfo(QNetworkReply *reply);
@@ -47,6 +51,7 @@ protected:
     bool tcpHeaderComplete;
     qint64 tcpContentLength = -1;
     QTimer *tcpTimeOutTimer;
+    QByteArray m_redircetUrl;
 
     std::optional<QUrlQuery> query;
 
