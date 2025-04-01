@@ -8,7 +8,6 @@
 #include <QNetworkReply>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
-#include <QTimer>
 #include <QUrlQuery>
 
 Loginer::Loginer(QObject *parent)

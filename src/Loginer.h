@@ -3,6 +3,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QObject>
+#include <QTimer>
 #include <QUrlQuery>
 
 class QNetworkAccessManager;
