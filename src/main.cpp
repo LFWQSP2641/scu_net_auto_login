@@ -3,6 +3,7 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +36,28 @@ int main(int argc, char *argv[])
                                      "service");
     parser.addOption(serviceOption);
 
+    // 添加重试和延迟相关的命令行参数
+    QCommandLineOption retryCountOption(QStringList() << "r"
+                                                      << "retry-count",
+                                        "登录失败后的重试次数，-1无限重试",
+                                        "count",
+                                        "0");
+    parser.addOption(retryCountOption);
+
+    QCommandLineOption retryDelayOption(QStringList() << "d"
+                                                      << "retry-delay",
+                                        "重试之间的延迟时间(秒)",
+                                        "seconds",
+                                        "5");
+    parser.addOption(retryDelayOption);
+
+    QCommandLineOption initialDelayOption(QStringList() << "i"
+                                                        << "initial-delay",
+                                          "首次登录尝试前的延迟时间(秒)",
+                                          "seconds",
+                                          "0");
+    parser.addOption(initialDelayOption);
+
     // 解析命令行参数
     parser.process(a);
 
@@ -62,6 +85,11 @@ int main(int argc, char *argv[])
     QString password = parser.value(passwordOption);
     QString service = parser.value(serviceOption);
 
+    // 获取重试和延迟相关参数
+    int retryCount = parser.value(retryCountOption).toInt();
+    int retryDelay = parser.value(retryDelayOption).toInt() * 1000;     // 转换为毫秒
+    int initialDelay = parser.value(initialDelayOption).toInt() * 1000; // 转换为毫秒
+
     // 验证服务类型
     QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
     if (!validServices.contains(service))
@@ -71,13 +99,46 @@ int main(int argc, char *argv[])
     }
 
     Loginer loginer;
-    loginer.login(username, password, service);
 
+    // 重试计数器
+    int currentRetry = 0;
+
+    // 连接信号处理
     QObject::connect(&loginer, &Loginer::messageReceived, [](const QString &message)
                      { qDebug() << "\033[1;92m[信息]\033[0m " << message << Qt::endl; });
+
     QObject::connect(&loginer, &Loginer::errorOccurred, [](const QString &error)
                      { qWarning() << "\033[1;91m[错误]\033[0m " << error << Qt::endl; });
-    QObject::connect(&loginer, &Loginer::loginFinished, &a, &QCoreApplication::quit);
+
+    QObject::connect(&loginer, &Loginer::loginSuccess, &a, &QCoreApplication::quit);
+    QObject::connect(&loginer, &Loginer::loginFailed, [&loginer, &username, &password, &service, &currentRetry, retryCount, retryDelay]()
+                     {
+                         // 检查是否还有重试次数
+                         if (currentRetry < retryCount || retryCount == -1)
+                         {
+                             currentRetry++;
+                             qDebug() << "\033[1;93m[重试]\033[0m 第" << currentRetry << "次重试，"
+                                      << retryDelay/1000 << "秒后重试..." << Qt::endl;
+
+                             // 延迟后重试
+                             QTimer::singleShot(retryDelay, &loginer, [&loginer, username, password, service]() {
+                                 qDebug() << "\033[1;93m[重试]\033[0m 正在重新尝试登录..." << Qt::endl;
+                                 loginer.login(username, password, service);
+                             });
+                         } });
+
+    // 如果设置了初始延迟，则延迟后开始登录
+    if (initialDelay > 0)
+    {
+        qDebug() << "\033[1;92m[信息]\033[0m 将在" << initialDelay / 1000 << "秒后开始登录..." << Qt::endl;
+        QTimer::singleShot(initialDelay, &loginer, [&loginer, username, password, service]()
+                           { loginer.login(username, password, service); });
+    }
+    else
+    {
+        // 直接开始登录
+        loginer.login(username, password, service);
+    }
 
     return a.exec();
 }
