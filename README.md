@@ -15,9 +15,19 @@ RSA 零填充的方式加密存在安全隐患。
 
 然而，根据 HTTP 协议规范（RFC 7230），请求头的键名是大小写不敏感的，即 "Host" 和 "host" 应该被视为相同。但是，川大校园网对请求头 `host:123.123.123.123` 会直接断开 TCP 连接，返回`[FIN, ACK]`。
 
-且 Qt 的 QNetworkAccessManager 在发送请求时，会将请求头的键名转换为小写字母，这导致了 Qt 版本无法正常工作。
+且 Qt 的 QNetworkAccessManager 在发送请求时，会将请求头的键名转换为小写字母，这导致了 QNetworkAccessManager 无法正常工作。
 
 因此，C++ 版本使用了 QTcpSocket 进行 TCP 连接，手动构造 HTTP 请求。
+
+## 使用方法
+
+C++ 版本：
+在 [Release](https://github.com/LFWQSP2641/scu_net_auto_login/releases) 中下载 `scu_net_auto_login.exe`。
+在命令行中运行 `scu_net_auto_login.exe -u <username> -p <password> -s <service>`，其中 `<username>` 和 `<password>` 分别为用户名和密码，`<service>` 为服务类型（如 `EDUNET` 、`CHINATELECOM`、`CHINAMOBILE` 或 `CHINAUNICOM`）。
+
+Python 版本：
+下载源码，在 `python` 目录下运行 `python main.py -u <username> -p <password> -s <service>`，其中 `<username>` 和 `<password>` 分别为用户名和密码，`<service>` 为服务类型（如 `EDUNET` 、`CHINATELECOM`、`CHINAMOBILE` 或 `CHINAUNICOM`）。
+在 `python` 目录下运行 `python main.py -h` 查看帮助信息。
 
 ## TODO
 

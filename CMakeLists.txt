@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.19)
 project(scu_net_auto_login LANGUAGES CXX)
+set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Network)
 
 qt_standard_project_setup()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 qt_add_executable(scu_net_auto_login
-    main.cpp
-    BigInt.hpp
-    Loginer.h Loginer.cpp
-    RSAUtils.h RSAUtils.cpp
+    src/main.cpp
+    src/BigInt.hpp
+    src/Loginer.h src/Loginer.cpp
+    src/RSAUtils.h src/RSAUtils.cpp
 )
 
 target_link_libraries(scu_net_auto_login
