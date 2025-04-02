@@ -24,7 +24,10 @@ Python 暂不接受 feature request, PR welcome。
 ## 使用方法
 
 C++ 版本：
-在 [Release](https://github.com/LFWQSP2641/scu_net_auto_login/releases) 中下载 `scu_net_auto_login.exe`。
+在 [Release](https://github.com/LFWQSP2641/scu_net_auto_login/releases) 中下载 `scu_net_auto_login_windows_win64_msvc2022_64.7z`。
+
+**`v1.1.0`版本之后，可以直接配置文件 `Config/setting.json` 中的参数，建议使用配置文件。**
+
 在命令行中运行 `scu_net_auto_login.exe -u <username> -p <password> -s <service> [--hotspot] [--connect]`，其中：
 
 - `<username>` 和 `<password>` 分别为用户名和密码（必填）
@@ -45,8 +48,6 @@ C++ 版本：
 ```bash
 scu_net_auto_login -u 123 -p 123 -s EDUNET --initial-delay 5 --hotspot --connect --use-config true
 ```
-
-**`v1.1.0`版本之后，可以直接配置文件 `Config/setting.json` 中的参数。**
 
 ---
 
