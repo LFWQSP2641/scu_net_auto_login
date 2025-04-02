@@ -29,6 +29,7 @@ Loginer::Loginer(QObject *parent)
 {
     netManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
     netManager->setProxy(QNetworkProxy::NoProxy);
+    socket->setProxy(QNetworkProxy::NoProxy);
 
     tcpTimeOutTimer->setSingleShot(true);
 
@@ -221,6 +222,7 @@ void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
     if (socketError != QAbstractSocket::RemoteHostClosedError)
     {
         emit errorOccurred(socket->errorString());
+        emit loginFailed();
     }
     socket->close();
 }

@@ -1,5 +1,6 @@
 #include "PlatformUtils.h"
 
+#include <QFile>
 #include <QProcess>
 
 namespace
@@ -38,7 +39,8 @@ do shell script "sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.
 
 PlatformUtils::PlatformUtils(QObject *parent)
     : QObject {parent},
-      m_openHotspotsProcess {nullptr}
+      m_openHotspotsProcess {nullptr},
+      m_connectSCUNETWifiProcess {nullptr}
 {
 }
 
@@ -62,6 +64,39 @@ void PlatformUtils::openHotspots()
 #endif
 }
 
+void PlatformUtils::connectSCUNETWifi()
+{
+    #if defined(Q_OS_WIN)
+    m_connectSCUNETWifiProcess = new QProcess(this);
+    m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
+    m_connectSCUNETWifiProcess->start("netsh", QStringList() << "wlan"
+                                                             << "connect"
+                                                             << "name=\"SCUNET\"");
+    connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
+    connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
+            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
+#elif defined(Q_OS_LINUX)
+    m_connectSCUNETWifiProcess = new QProcess(this);
+    m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
+    m_connectSCUNETWifiProcess->start("nmcli", QStringList() << "device" 
+                                                             << "wifi" 
+                                                             << "connect" 
+                                                             << "SCUNET");
+    connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
+    connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
+            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
+#elif defined(Q_OS_MAC)
+    m_connectSCUNETWifiProcess = new QProcess(this);
+    m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
+    m_connectSCUNETWifiProcess->start("networksetup", QStringList() << "-setairportnetwork" 
+                                                                    << "en0" 
+                                                                    << "SCUNET");
+    connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
+    connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
+            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
+#endif
+}
+
 void PlatformUtils::onOpenHotspotsFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if (m_openHotspotsProcess)
@@ -70,4 +105,14 @@ void PlatformUtils::onOpenHotspotsFinished(int exitCode, QProcess::ExitStatus ex
         m_openHotspotsProcess = nullptr;
     }
     emit openHotspotsFinished(exitCode, exitStatus);
+}
+
+void PlatformUtils::onConnectSCUNETWifiFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if (m_connectSCUNETWifiProcess)
+    {
+        m_connectSCUNETWifiProcess->deleteLater();
+        m_connectSCUNETWifiProcess = nullptr;
+    }
+    emit connectSCUNETWifiFinished(exitCode, exitStatus);
 }

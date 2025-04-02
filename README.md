@@ -25,13 +25,24 @@ Python 暂不接受 feature request, PR welcome。
 
 C++ 版本：
 在 [Release](https://github.com/LFWQSP2641/scu_net_auto_login/releases) 中下载 `scu_net_auto_login.exe`。
-在命令行中运行 `scu_net_auto_login.exe -u <username> -p <password> -s <service> [--hotspot]`，其中 `<username>` 和 `<password>` 分别为用户名和密码，`<service>` 为服务类型（如 `EDUNET` 、`CHINATELECOM`、`CHINAMOBILE` 或 `CHINAUNICOM`）。`hotspot` 可在连接后自动开启热点。
+在命令行中运行 `scu_net_auto_login.exe -u <username> -p <password> -s <service> [--hotspot] [--connect]`，其中：
+
+- `<username>` 和 `<password>` 分别为用户名和密码（必填）
+- `<service>` 为服务类型（如 `EDUNET` 、`CHINATELECOM`、`CHINAMOBILE` 或 `CHINAUNICOM`）（必填）
+- `retry-count` 重试次数，默认为 0 次，-1 表示无限重试
+- `initial-delay` 初始延迟，单位为秒，默认为 0 秒
+- `retry-delay` 重试延迟，单位为秒，默认为 5 秒
+- `hotspot` 可在连接后自动开启热点。
+- `connect` 可在连接前自动连接 SCUNET wifi。
+
 运行 `scu_net_auto_login.exe -h` 查看帮助信息。
+
+设置 `connect` 建议设置 `initial-delay` 否则第一次登录会失败。
 
 示例：
 
 ```bash
-scu_net_auto_login -u 123 -p 123 -s EDUNET --hotspot
+scu_net_auto_login -u 123 -p 123 -s EDUNET --initial-delay 5 --hotspot --connect
 ```
 
 Python 版本：
@@ -44,11 +55,15 @@ Python 版本：
   - 适配 Windows 10 2004 及以上版本
   - macOS 未测试
   - Linux 未实现，PR wellcome
+- 调用系统连接 SCUNET wifi
+  - 仅适配 Windows，且之前需连接过 SCUNET wifi
+  - macOS 未测试
+  - Linux 未测试
 
 ## TODO
 
 - 共通
-- [ ] 调用系统 api 连接 SCUNET wifi
+- [x] 调用系统连接 SCUNET wifi
 - [x] 连接成功后，自动开启移动热点
 - [ ] 程序传参可加密
 - [ ] 配置文件加密

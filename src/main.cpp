@@ -1,3 +1,4 @@
+#include "Global.h"
 #include "Loginer.h"
 #include "PlatformUtils.h"
 
@@ -78,6 +79,8 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(myMessageHandler);
 
+    Global::initOnce();
+
     // 创建命令行参数解析器
     QCommandLineParser parser;
     parser.setApplicationDescription("四川大学校园网自动登录工具");
@@ -129,6 +132,10 @@ int main(int argc, char *argv[])
                                      "登录成功后是否开启热点");
     parser.addOption(hotspotOption);
 
+    QCommandLineOption connectSCUNETWifiOption(QStringList() << "connect",
+                                               "登录成功后是否连接SCUNET WiFi");
+    parser.addOption(connectSCUNETWifiOption);
+
     // 解析命令行参数
     parser.process(a);
 
@@ -152,16 +159,17 @@ int main(int argc, char *argv[])
     }
 
     // 获取参数值
-    QString username = parser.value(usernameOption);
-    QString password = parser.value(passwordOption);
-    QString service = parser.value(serviceOption);
+    const QString username = parser.value(usernameOption);
+    const QString password = parser.value(passwordOption);
+    const QString service = parser.value(serviceOption);
 
     // 获取重试和延迟相关参数
-    int retryCount = parser.value(retryCountOption).toInt();
-    int retryDelay = parser.value(retryDelayOption).toInt() * 1000;     // 转换为毫秒
-    int initialDelay = parser.value(initialDelayOption).toInt() * 1000; // 转换为毫秒
+    const int retryCount = parser.value(retryCountOption).toInt();
+    const int retryDelay = parser.value(retryDelayOption).toInt() * 1000;     // 转换为毫秒
+    const int initialDelay = parser.value(initialDelayOption).toInt() * 1000; // 转换为毫秒
 
-    bool enableHotspot = parser.isSet(hotspotOption);
+    const bool enableHotspot = parser.isSet(hotspotOption);
+    const bool enableConnectSCUNETWifi = parser.isSet(connectSCUNETWifiOption);
 
     // 验证服务类型
     QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
@@ -220,17 +228,41 @@ int main(int argc, char *argv[])
                              });
                          } });
 
-    // 如果设置了初始延迟，则延迟后开始登录
-    if (initialDelay > 0)
+    const auto startLogin = [&loginer, &username, &password, &service](int delay)
     {
-        qDebug() << "\033[1;92m[信息]\033[0m 将在" << initialDelay / 1000 << "秒后开始登录..." << Qt::endl;
-        QTimer::singleShot(initialDelay, &loginer, [&loginer, username, password, service]()
-                           { loginer.login(username, password, service); });
+        // 如果设置了初始延迟，则延迟后开始登录
+        if (delay > 0)
+        {
+            qDebug() << "\033[1;92m[信息]\033[0m 将在" << delay / 1000 << "秒后开始登录..." << Qt::endl;
+            QTimer::singleShot(delay, &loginer, [&loginer, username, password, service]()
+                               { loginer.login(username, password, service); });
+        }
+        else
+        {
+            // 直接开始登录
+            loginer.login(username, password, service);
+        }
+    };
+
+    if (enableConnectSCUNETWifi)
+    {
+        platformUtils.connectSCUNETWifi();
+        QObject::connect(&platformUtils, &PlatformUtils::connectSCUNETWifiFinished, &loginer, [&a, &platformUtils, &startLogin, initialDelay](int exitCode, QProcess::ExitStatus exitStatus)
+                         {
+                             if (exitStatus == QProcess::NormalExit && exitCode == 0)
+                             {
+                                 qDebug() << "\033[1;92m[信息]\033[0m 已连接SCUNET WiFi" << Qt::endl;
+                                 startLogin(initialDelay);
+                             }
+                             else
+                             {
+                                 qWarning() << "\033[1;91m[错误]\033[0m 连接SCUNET WiFi失败" << Qt::endl;
+                                 a.exit(1);
+                             } });
     }
     else
     {
-        // 直接开始登录
-        loginer.login(username, password, service);
+        startLogin(initialDelay);
     }
 
     return a.exec();

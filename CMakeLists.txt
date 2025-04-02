@@ -14,6 +14,7 @@ qt_add_executable(scu_net_auto_login
     src/Loginer.h src/Loginer.cpp
     src/RSAUtils.h src/RSAUtils.cpp
     src/PlatformUtils.h src/PlatformUtils.cpp
+    src/Global.h src/Global.cpp
 )
 
 target_link_libraries(scu_net_auto_login
