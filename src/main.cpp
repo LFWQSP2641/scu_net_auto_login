@@ -1,6 +1,7 @@
 #include "Global.h"
 #include "Loginer.h"
 #include "PlatformUtils.h"
+#include "Settings.h"
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
@@ -136,40 +137,75 @@ int main(int argc, char *argv[])
                                                "登录成功后是否连接SCUNET WiFi");
     parser.addOption(connectSCUNETWifiOption);
 
+    QCommandLineOption useConfigOption(QStringList() << "c"
+                                                     << "use-config",
+                                       "是否使用配置文件（默认: 是）",
+                                       "true/false",
+                                       "true");
+    parser.addOption(useConfigOption);
+
     // 解析命令行参数
     parser.process(a);
 
+    const bool useConfig = parser.value(useConfigOption).toLower() == "true";
+
+    QString username;
+    QString password;
+    QString service;
+    int retryCount = 0;
+    int retryDelay = 5000; // 默认值：5秒
+    int initialDelay = 0;  // 默认值：0秒
+    bool enableHotspot = false;
+    bool enableConnectSCUNETWifi = false;
+
+    // 根据 useConfig 的值加载参数
+    if (useConfig)
+    {
+        qDebug() << "\033[1;92m[信息]\033[0m 正在从配置文件加载参数..." << Qt::endl;
+
+        // 从配置文件加载参数
+        username = parser.isSet(usernameOption) ? parser.value(usernameOption) : Settings::getSingletonSettings()->username();
+        password = parser.isSet(passwordOption) ? parser.value(passwordOption) : Settings::getSingletonSettings()->password();
+        service = parser.isSet(serviceOption) ? parser.value(serviceOption) : Settings::getSingletonSettings()->service();
+        retryCount = parser.isSet(retryCountOption) ? parser.value(retryCountOption).toInt() : Settings::getSingletonSettings()->retryCount();
+        retryDelay = parser.isSet(retryDelayOption) ? parser.value(retryDelayOption).toDouble() * 1000 : Settings::getSingletonSettings()->retryDelay();         // 转换为毫秒
+        initialDelay = parser.isSet(initialDelayOption) ? parser.value(initialDelayOption).toDouble() * 1000 : Settings::getSingletonSettings()->initialDelay(); // 转换为毫秒
+        enableHotspot = parser.isSet(hotspotOption) ? true : Settings::getSingletonSettings()->enableHotspot();
+        enableConnectSCUNETWifi = parser.isSet(connectSCUNETWifiOption) ? true : Settings::getSingletonSettings()->enableConnectSCUNETWifi();
+    }
+    else
+    {
+        qDebug() << "\033[1;92m[信息]\033[0m 未使用配置文件，所有参数需从命令行提供" << Qt::endl;
+
+        // 从命令行加载参数
+        username = parser.value(usernameOption);
+        password = parser.value(passwordOption);
+        service = parser.value(serviceOption);
+        retryCount = parser.value(retryCountOption).toInt();
+        retryDelay = parser.value(retryDelayOption).toDouble() * 1000;     // 转换为毫秒
+        initialDelay = parser.value(initialDelayOption).toDouble() * 1000; // 转换为毫秒
+        enableHotspot = parser.isSet(hotspotOption);
+        enableConnectSCUNETWifi = parser.isSet(connectSCUNETWifiOption);
+    }
+
     // 检查必要参数
-    if (!parser.isSet(usernameOption))
+    if (username.isEmpty())
     {
         qWarning() << "\033[1;91m[错误]\033[0m 必须提供用户名参数 (-u, --username)" << Qt::endl;
         return 1;
     }
 
-    if (!parser.isSet(passwordOption))
+    if (password.isEmpty())
     {
         qWarning() << "\033[1;91m[错误]\033[0m 必须提供密码参数 (-p, --password)" << Qt::endl;
         return 1;
     }
 
-    if (!parser.isSet(serviceOption))
+    if (service.isEmpty())
     {
         qWarning() << "\033[1;91m[错误]\033[0m 必须提供服务类型参数 (-s, --service)" << Qt::endl;
         return 1;
     }
-
-    // 获取参数值
-    const QString username = parser.value(usernameOption);
-    const QString password = parser.value(passwordOption);
-    const QString service = parser.value(serviceOption);
-
-    // 获取重试和延迟相关参数
-    const int retryCount = parser.value(retryCountOption).toInt();
-    const int retryDelay = parser.value(retryDelayOption).toInt() * 1000;     // 转换为毫秒
-    const int initialDelay = parser.value(initialDelayOption).toInt() * 1000; // 转换为毫秒
-
-    const bool enableHotspot = parser.isSet(hotspotOption);
-    const bool enableConnectSCUNETWifi = parser.isSet(connectSCUNETWifiOption);
 
     // 验证服务类型
     QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};

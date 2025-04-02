@@ -30,11 +30,11 @@ QString Global::getTempDirPath(const QString &sub)
 {
     if (sub.startsWith(QStringLiteral("/")))
     {
-        return Global::tempDirPath.append(sub);
+        return QString(Global::tempDirPath).append(sub);
     }
     else
     {
-        return Global::tempDirPath.append(QStringLiteral("/")).append(sub);
+        return QString(Global::tempDirPath).append(QStringLiteral("/")).append(sub);
     }
 }
 
@@ -42,11 +42,11 @@ QString Global::getDataDirPath(const QString &sub)
 {
     if (sub.startsWith(QStringLiteral("/")))
     {
-        return Global::dataDirPath.append(sub);
+        return QString(Global::dataDirPath).append(sub);
     }
     else
     {
-        return Global::dataDirPath.append(QStringLiteral("/")).append(sub);
+        return QString(Global::dataDirPath).append(QStringLiteral("/")).append(sub);
     }
 }
 
@@ -54,10 +54,10 @@ QString Global::getConfigDirPath(const QString &sub)
 {
     if (sub.startsWith(QStringLiteral("/")))
     {
-        return Global::configDirName.append(sub);
+        return QString(Global::configDirName).append(sub);
     }
     else
     {
-        return Global::configDirName.append(QStringLiteral("/")).append(sub);
+        return QString(Global::configDirName).append(QStringLiteral("/")).append(sub);
     }
 }
