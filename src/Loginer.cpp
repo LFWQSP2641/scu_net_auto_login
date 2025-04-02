@@ -61,6 +61,8 @@ void Loginer::login(const QString &username, const QString &password, const QStr
         return;
     }
 
+    emit messageReceived(QStringLiteral("正在获取登录参数..."));
+
     getQuery();
 }
 
