@@ -4,7 +4,7 @@
 
 有 Python 和 C++ (Qt) 两种实现。
 
-C++ (Qt) 功能更多。
+C++ (Qt) 功能更多。Python 仅有登录功能。
 
 Python 暂不接受 feature request, PR welcome。
 
@@ -34,6 +34,7 @@ C++ 版本：
 - `retry-delay` 重试延迟，单位为秒，默认为 5 秒
 - `hotspot` 可在连接后自动开启热点。
 - `connect` 可在连接前自动连接 SCUNET wifi。
+- `use-config` 可取值 `true` 或 `false`，默认为 `true`，表示是否使用配置文件中的参数。
 
 运行 `scu_net_auto_login.exe -h` 查看帮助信息。
 
@@ -42,12 +43,34 @@ C++ 版本：
 示例：
 
 ```bash
-scu_net_auto_login -u 123 -p 123 -s EDUNET --initial-delay 5 --hotspot --connect
+scu_net_auto_login -u 123 -p 123 -s EDUNET --initial-delay 5 --hotspot --connect --use-config true
 ```
+
+**`v1.1.0`版本之后，可以直接配置文件 `Config/setting.json` 中的参数。**
+
+---
 
 Python 版本：
 下载源码，在 `python` 目录下运行 `python main.py -u <username> -p <password> -s <service>`，其中 `<username>` 和 `<password>` 分别为用户名和密码，`<service>` 为服务类型（如 `EDUNET` 、`CHINATELECOM`、`CHINAMOBILE` 或 `CHINAUNICOM`）。
 在 `python` 目录下运行 `python main.py -h` 查看帮助信息。
+
+### 使用基于绕过校园网认证的方式，访问川大微服务，将已登录的设备踢出
+
+以下内容不适合新手用户，不使用这个功能的用户可以忽略。
+
+首先请参考 [绕过校园网认证](https://lfwqsp2641.me/bypass-campus-network.html) ，搭建好服务端。
+
+然后在配置文件 `Config/setting.json` 中，设置以下字段：
+
+- `enableAutoTick` bool，是否启用自动踢出设备，默认 `false`
+- 川大微服务 cookie
+  - `cookieEaiSess`
+  - `cookieUUkey`
+- 绕过校园网认证的核心和配置文件
+  - `bypassCampusNetworkCore` 如：`Software/hysteria2/hysteria-windows-amd64.exe`
+  - `bypassCampusNetworkCoreCommand` 如：`"-c", "Software/hysteria2/config.yaml"`
+  - `bypassCampusNetworkCorePort` 如：`8080`
+  - `bypassCampusNetworkSocks5Proxy` bool，是否为 Socks5 代理，`false` 则表示为 Http 代理，默认 `true`
 
 ## Feature
 
@@ -59,13 +82,15 @@ Python 版本：
   - 仅适配 Windows，且之前需连接过 SCUNET wifi
   - macOS 未测试
   - Linux 未测试
+- 使用基于 [绕过校园网认证](https://lfwqsp2641.me/bypass-campus-network.html) 的方式，访问川大微服务，将已登录的设备踢出。
+  - 适配 Windows、macOS 和 Linux
 
 ## TODO
 
 - 共通
 - [x] 调用系统连接 SCUNET wifi
 - [x] 连接成功后，自动开启移动热点
-- [ ] 使用基于 [绕过校园网认证](https://lfwqsp2641.me/bypass-campus-network.html) 的方式，访问川大微服务，将已登录的设备踢出。
+- [x] 使用基于 [绕过校园网认证](https://lfwqsp2641.me/bypass-campus-network.html) 的方式，访问川大微服务，将已登录的设备踢出。
 
 ---
 
