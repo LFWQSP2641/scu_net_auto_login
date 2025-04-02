@@ -13,6 +13,7 @@ qt_add_executable(scu_net_auto_login
     src/BigInt.hpp
     src/Loginer.h src/Loginer.cpp
     src/RSAUtils.h src/RSAUtils.cpp
+    src/PlatformUtils.h src/PlatformUtils.cpp
 )
 
 target_link_libraries(scu_net_auto_login

@@ -1,4 +1,5 @@
 #include "Loginer.h"
+#include "PlatformUtils.h"
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
@@ -124,6 +125,10 @@ int main(int argc, char *argv[])
                                           "0");
     parser.addOption(initialDelayOption);
 
+    QCommandLineOption hotspotOption(QStringList() << "hotspot",
+                                     "登录成功后是否开启热点");
+    parser.addOption(hotspotOption);
+
     // 解析命令行参数
     parser.process(a);
 
@@ -156,6 +161,8 @@ int main(int argc, char *argv[])
     int retryDelay = parser.value(retryDelayOption).toInt() * 1000;     // 转换为毫秒
     int initialDelay = parser.value(initialDelayOption).toInt() * 1000; // 转换为毫秒
 
+    bool enableHotspot = parser.isSet(hotspotOption);
+
     // 验证服务类型
     QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
     if (!validServices.contains(service))
@@ -165,6 +172,7 @@ int main(int argc, char *argv[])
     }
 
     Loginer loginer;
+    PlatformUtils platformUtils;
 
     // 重试计数器
     int currentRetry = 0;
@@ -176,7 +184,26 @@ int main(int argc, char *argv[])
     QObject::connect(&loginer, &Loginer::errorOccurred, [](const QString &error)
                      { qWarning() << "\033[1;91m[错误]\033[0m " << error << Qt::endl; });
 
-    QObject::connect(&loginer, &Loginer::loginSuccess, &a, &QCoreApplication::quit);
+    if (enableHotspot)
+    {
+        QObject::connect(&loginer, &Loginer::loginSuccess, &platformUtils, &PlatformUtils::openHotspots);
+        QObject::connect(&platformUtils, &PlatformUtils::openHotspotsFinished, &a, [&a](int exitCode, QProcess::ExitStatus exitStatus)
+                         {
+                             if (exitStatus == QProcess::NormalExit && exitCode == 0)
+                             {
+                                 qDebug() << "\033[1;92m[信息]\033[0m 热点已开启" << Qt::endl;
+                                 a.exit(0);
+                             }
+                             else
+                             {
+                                 qWarning() << "\033[1;91m[错误]\033[0m 开启热点失败" << Qt::endl;
+                                 a.exit(1);
+                             } });
+    }
+    else
+    {
+        QObject::connect(&loginer, &Loginer::loginSuccess, &a, &QCoreApplication::quit);
+    }
     QObject::connect(&loginer, &Loginer::loginFailed, [&loginer, &username, &password, &service, &currentRetry, retryCount, retryDelay]()
                      {
                          // 检查是否还有重试次数
