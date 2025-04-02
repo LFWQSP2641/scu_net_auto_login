@@ -46,55 +46,39 @@ PlatformUtils::PlatformUtils(QObject *parent)
 
 void PlatformUtils::openHotspots()
 {
+    m_openHotspotsProcess = new QProcess(this);
+    m_openHotspotsProcess->setProcessChannelMode(QProcess::MergedChannels);
 #if defined(Q_OS_WIN)
-    m_openHotspotsProcess = new QProcess(this);
-    m_openHotspotsProcess->setProcessChannelMode(QProcess::MergedChannels);
     m_openHotspotsProcess->start("powershell", QStringList() << "-Command" << windows10HotspotPowerShellScript);
-    connect(m_openHotspotsProcess, &QProcess::finished, this, &PlatformUtils::onOpenHotspotsFinished);
-    connect(m_openHotspotsProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit openHotspotsOutput(m_openHotspotsProcess->readAllStandardOutput()); });
-
 #elif defined(Q_OS_MAC)
-    m_openHotspotsProcess = new QProcess(this);
-    m_openHotspotsProcess->setProcessChannelMode(QProcess::MergedChannels);
     m_openHotspotsProcess->start("osascript", QStringList() << "-e" << macHotspotScript);
+#endif
     connect(m_openHotspotsProcess, &QProcess::finished, this, &PlatformUtils::onOpenHotspotsFinished);
     connect(m_openHotspotsProcess, &QProcess::readyReadStandardOutput, this, [this]
             { emit openHotspotsOutput(m_openHotspotsProcess->readAllStandardOutput()); });
-#endif
 }
 
 void PlatformUtils::connectSCUNETWifi()
 {
-    #if defined(Q_OS_WIN)
     m_connectSCUNETWifiProcess = new QProcess(this);
     m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
+#if defined(Q_OS_WIN)
     m_connectSCUNETWifiProcess->start("netsh", QStringList() << "wlan"
                                                              << "connect"
                                                              << "name=\"SCUNET\"");
-    connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
-    connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
 #elif defined(Q_OS_LINUX)
-    m_connectSCUNETWifiProcess = new QProcess(this);
-    m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
-    m_connectSCUNETWifiProcess->start("nmcli", QStringList() << "device" 
-                                                             << "wifi" 
-                                                             << "connect" 
+    m_connectSCUNETWifiProcess->start("nmcli", QStringList() << "device"
+                                                             << "wifi"
+                                                             << "connect"
                                                              << "SCUNET");
-    connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
-    connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
 #elif defined(Q_OS_MAC)
-    m_connectSCUNETWifiProcess = new QProcess(this);
-    m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
-    m_connectSCUNETWifiProcess->start("networksetup", QStringList() << "-setairportnetwork" 
-                                                                    << "en0" 
+    m_connectSCUNETWifiProcess->start("networksetup", QStringList() << "-setairportnetwork"
+                                                                    << "en0"
                                                                     << "SCUNET");
+#endif
     connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
     connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
             { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
-#endif
 }
 
 void PlatformUtils::onOpenHotspotsFinished(int exitCode, QProcess::ExitStatus exitStatus)
