@@ -19,6 +19,19 @@ public:
     explicit Loginer(QObject *parent = nullptr);
     ~Loginer();
 
+    enum FailedType
+    {
+        NetworkError,
+        RedirectError,
+        LoginError,
+        TimeoutError,
+        RiskControl,
+        DeviceMaxOnline,
+        UserInputError,
+        Unknown
+    };
+    Q_ENUM(FailedType)
+
 public slots:
     void login(const QString &username, const QString &password, const QString &service);
 
@@ -66,6 +79,6 @@ signals:
     void messageReceived(const QString &message);
     void errorOccurred(const QString &error);
     void firstRedirectedFinished(QNetworkReply *reply);
-    void loginFailed();
+    void loginFailed(Loginer::FailedType failedType);
     void loginSuccess();
 };

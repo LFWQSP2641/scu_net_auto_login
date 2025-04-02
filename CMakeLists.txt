@@ -16,6 +16,7 @@ qt_add_executable(scu_net_auto_login
     src/PlatformUtils.h src/PlatformUtils.cpp
     src/Global.h src/Global.cpp
     src/Settings.h src/Settings.cpp
+    src/AutoTickDevice.h src/AutoTickDevice.cpp
 )
 
 target_link_libraries(scu_net_auto_login

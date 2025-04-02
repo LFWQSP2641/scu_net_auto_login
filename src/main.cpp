@@ -1,3 +1,4 @@
+#include "AutoTickDevice.h"
 #include "Global.h"
 #include "Loginer.h"
 #include "PlatformUtils.h"
@@ -217,9 +218,11 @@ int main(int argc, char *argv[])
 
     Loginer loginer;
     PlatformUtils platformUtils;
+    AutoTickDevice autoTickDevice;
 
     // 重试计数器
     int currentRetry = 0;
+    bool tryAutoTick = false;
 
     // 连接信号处理
     QObject::connect(&loginer, &Loginer::messageReceived, [](const QString &message)
@@ -227,6 +230,21 @@ int main(int argc, char *argv[])
 
     QObject::connect(&loginer, &Loginer::errorOccurred, [](const QString &error)
                      { qWarning() << "\033[1;91m[错误]\033[0m " << error << Qt::endl; });
+
+    QObject::connect(&autoTickDevice, &AutoTickDevice::messageReceived, [&a](const QString &message)
+                     { qDebug() << "\033[1;92m[信息]\033[0m " << message << Qt::endl; });
+
+    QObject::connect(&autoTickDevice, &AutoTickDevice::errorOccurred, [&a](const QString &error)
+                     { qWarning() << "\033[1;91m[错误]\033[0m " << error << Qt::endl; });
+
+    QObject::connect(&autoTickDevice, &AutoTickDevice::coreOutput, [&a](const QString &message)
+                     { qWarning() << "\033[1;92m[信息]\033[0m 核心输出: " << message << Qt::endl; });
+
+    QObject::connect(&autoTickDevice, &AutoTickDevice::tickSuccess, &loginer, [&loginer, username, password, service]()
+                     { loginer.login(username, password, service); });
+
+    QObject::connect(&autoTickDevice, &AutoTickDevice::tickFailed, &a, [&a]()
+                     { qWarning() << "\033[1;91m[错误]\033[0m 踢出设备失败" << Qt::endl; a.exit(1); });
 
     if (enableHotspot)
     {
@@ -248,21 +266,28 @@ int main(int argc, char *argv[])
     {
         QObject::connect(&loginer, &Loginer::loginSuccess, &a, &QCoreApplication::quit);
     }
-    QObject::connect(&loginer, &Loginer::loginFailed, [&loginer, &username, &password, &service, &currentRetry, retryCount, retryDelay]()
-                     {
-                         // 检查是否还有重试次数
-                         if (currentRetry < retryCount || retryCount == -1)
-                         {
-                             currentRetry++;
-                             qDebug() << "\033[1;93m[重试]\033[0m 第" << currentRetry << "次重试，"
-                                      << retryDelay/1000 << "秒后重试..." << Qt::endl;
 
-                             // 延迟后重试
-                             QTimer::singleShot(retryDelay, &loginer, [&loginer, username, password, service]() {
-                                 qDebug() << "\033[1;93m[重试]\033[0m 正在重新尝试登录..." << Qt::endl;
-                                 loginer.login(username, password, service);
-                             });
-                         } });
+    QObject::connect(&loginer, &Loginer::loginFailed, &loginer, [&loginer, &username, &password, &service, &currentRetry, retryCount, retryDelay, &autoTickDevice, &tryAutoTick](Loginer::FailedType failedType)
+                     {
+                        if (failedType == Loginer::FailedType::DeviceMaxOnline && Settings::getSingletonSettings()->enableAutoTick() && !tryAutoTick)
+                        {
+                            autoTickDevice.tickDevice();
+                            tryAutoTick = true;
+                            return;
+                        }
+                         // 检查是否还有重试次数
+                        if (currentRetry < retryCount || retryCount == -1)
+                        {
+                            currentRetry++;
+                            qDebug() << "\033[1;93m[重试]\033[0m 第" << currentRetry << "次重试，"
+                                << retryDelay / 1000 << "秒后重试..." << Qt::endl;
+
+                            // 延迟后重试
+                            QTimer::singleShot(retryDelay, &loginer, [&loginer, username, password, service]()
+                                            {
+                                                qDebug() << "\033[1;93m[重试]\033[0m 正在重新尝试登录..." << Qt::endl;
+                                                loginer.login(username, password, service); });
+                        } });
 
     const auto startLogin = [&loginer, &username, &password, &service](int delay)
     {

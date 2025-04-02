@@ -181,6 +181,45 @@ void Settings::setEnableAutoTick(bool newEnableAutoTick)
     emit enableAutoTickChanged();
 }
 
+QString Settings::cookieEaiSess() const
+{
+    return m_cookieEaiSess;
+}
+
+void Settings::setCookieEaiSess(const QString &newCookieEaiSess)
+{
+    if (m_cookieEaiSess == newCookieEaiSess)
+        return;
+    m_cookieEaiSess = newCookieEaiSess;
+    emit cookieEaiSessChanged();
+}
+
+QString Settings::cookieUUkey() const
+{
+    return m_cookieUUkey;
+}
+
+void Settings::setCookieUUkey(const QString &newCookieUUkey)
+{
+    if (m_cookieUUkey == newCookieUUkey)
+        return;
+    m_cookieUUkey = newCookieUUkey;
+    emit cookieUUkeyChanged();
+}
+
+bool Settings::bypassCampusNetworkSocks5Proxy() const
+{
+    return m_bypassCampusNetworkSocks5Proxy;
+}
+
+void Settings::setBypassCampusNetworkSocks5Proxy(bool newBypassCampusNetworkSocks5Proxy)
+{
+    if (m_bypassCampusNetworkSocks5Proxy == newBypassCampusNetworkSocks5Proxy)
+        return;
+    m_bypassCampusNetworkSocks5Proxy = newBypassCampusNetworkSocks5Proxy;
+    emit bypassCampusNetworkSocks5ProxyChanged();
+}
+
 void Settings::saveSettings() const
 {
     QJsonObject settingJsonObject;
@@ -201,6 +240,9 @@ void Settings::saveSettings() const
     settingJsonObject.insert(QStringLiteral("bypassCampusNetworkCoreCommand"), bypassCampusNetworkCoreCommandList);
     settingJsonObject.insert(QStringLiteral("bypassCampusNetworkCorePort"), m_bypassCampusNetworkCorePort);
     settingJsonObject.insert(QStringLiteral("enableAutoTick"), m_enableAutoTick);
+    settingJsonObject.insert(QStringLiteral("cookieUUkey"), m_cookieUUkey);
+    settingJsonObject.insert(QStringLiteral("cookieEaiSess"), m_cookieEaiSess);
+    settingJsonObject.insert(QStringLiteral("bypassCampusNetworkSocks5Proxy"), m_bypassCampusNetworkSocks5Proxy);
 
     QFile file {Global::getConfigDirPath(QStringLiteral("/setting.json"))};
     file.open(QFile::WriteOnly);
@@ -241,4 +283,7 @@ void Settings::loadSettings()
     }
     m_bypassCampusNetworkCorePort = settingJsonObject.value(QStringLiteral("bypassCampusNetworkCorePort")).toInt(0);
     m_enableAutoTick = settingJsonObject.value(QStringLiteral("enableAutoTick")).toBool(false);
+    m_cookieUUkey = settingJsonObject.value(QStringLiteral("cookieUUkey")).toString();
+    m_cookieEaiSess = settingJsonObject.value(QStringLiteral("cookieEaiSess")).toString();
+    m_bypassCampusNetworkSocks5Proxy = settingJsonObject.value(QStringLiteral("bypassCampusNetworkSocks5Proxy")).toBool(true);
 }

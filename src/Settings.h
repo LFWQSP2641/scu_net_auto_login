@@ -35,6 +35,13 @@ public:
     void setBypassCampusNetworkCorePort(int newBypassCampusNetworkCorePort);
     bool enableAutoTick() const;
     void setEnableAutoTick(bool newEnableAutoTick);
+    QString cookieUUkey() const;
+    void setCookieUUkey(const QString &newCookieUUkey);
+    QString cookieEaiSess() const;
+    void setCookieEaiSess(const QString &newCookieEaiSess);
+
+    bool bypassCampusNetworkSocks5Proxy() const;
+    void setBypassCampusNetworkSocks5Proxy(bool newBypassCampusNetworkSocks5Proxy);
 
 public slots:
     void saveSettings() const;
@@ -56,6 +63,11 @@ protected:
 
     bool m_enableAutoTick;
 
+    QString m_cookieUUkey;
+    QString m_cookieEaiSess;
+
+    bool m_bypassCampusNetworkSocks5Proxy;
+
 signals:
     void usernameChanged();
     void passwordChanged();
@@ -69,6 +81,10 @@ signals:
     void bypassCampusNetworkCoreCommandChanged();
     void bypassCampusNetworkCorePortChanged();
     void enableAutoTickChanged();
+    void cookieUUkeyChanged();
+    void cookieEaiSessChanged();
+
+    void bypassCampusNetworkSocks5ProxyChanged();
 
 private:
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged FINAL)
@@ -83,4 +99,7 @@ private:
     Q_PROPERTY(QStringList bypassCampusNetworkCoreCommand READ bypassCampusNetworkCoreCommand WRITE setBypassCampusNetworkCoreCommand NOTIFY bypassCampusNetworkCoreCommandChanged FINAL)
     Q_PROPERTY(int bypassCampusNetworkCorePort READ bypassCampusNetworkCorePort WRITE setBypassCampusNetworkCorePort NOTIFY bypassCampusNetworkCorePortChanged FINAL)
     Q_PROPERTY(bool enableAutoTick READ enableAutoTick WRITE setEnableAutoTick NOTIFY enableAutoTickChanged FINAL)
+    Q_PROPERTY(QString cookieUUkey READ cookieUUkey WRITE setCookieUUkey NOTIFY cookieUUkeyChanged FINAL)
+    Q_PROPERTY(QString cookieEaiSess READ cookieEaiSess WRITE setCookieEaiSess NOTIFY cookieEaiSessChanged FINAL)
+    Q_PROPERTY(bool bypassCampusNetworkSocks5Proxy READ bypassCampusNetworkSocks5Proxy WRITE setBypassCampusNetworkSocks5Proxy NOTIFY bypassCampusNetworkSocks5ProxyChanged FINAL)
 };

@@ -58,7 +58,7 @@ void Loginer::login(const QString &username, const QString &password, const QStr
     if (m_serviceCode.isEmpty())
     {
         emit errorOccurred(QStringLiteral("不支持的服务商: ") + service);
-        emit loginFailed();
+        emit loginFailed(FailedType::UserInputError);
         return;
     }
 
@@ -113,7 +113,7 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     if (!query)
     {
         emit errorOccurred(QStringLiteral("无法获取必要数据"));
-        emit loginFailed();
+        emit loginFailed(FailedType::RedirectError);
     }
 
     const QUrl loginPostUrl(QStringLiteral("eportal/InterFace.do?method=login").prepend(mainUrl));
@@ -222,7 +222,7 @@ void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
     if (socketError != QAbstractSocket::RemoteHostClosedError)
     {
         emit errorOccurred(socket->errorString());
-        emit loginFailed();
+        emit loginFailed(FailedType::NetworkError);
     }
     socket->close();
 }
@@ -230,7 +230,7 @@ void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
 void Loginer::onTcpSocketTimeOut()
 {
     emit errorOccurred(QStringLiteral("请求超时"));
-    emit loginFailed();
+    emit loginFailed(FailedType::TimeoutError);
     socket->close();
 }
 
@@ -240,7 +240,7 @@ void Loginer::onTcpSocketDisconnected()
     if (!queryStr.has_value())
     {
         emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
-        emit loginFailed();
+        emit loginFailed(FailedType::Unknown);
         return;
     }
 
@@ -264,12 +264,17 @@ void Loginer::onLoginRequestFinished(QNetworkReply *reply)
     else if (replyData.contains(QByteArrayLiteral("\"message\":\"验证码错误.\"")))
     {
         emit errorOccurred(QStringLiteral("触发风控").append(replyData));
-        emit loginFailed();
+        emit loginFailed(FailedType::RiskControl);
+    }
+    else if (replyData.contains(QByteArrayLiteral("\"message\":\"你使用的账号已达到同时在线用户数量上限!\"")))
+    {
+        emit errorOccurred(QStringLiteral("已达到同时在线用户数量上限").append(replyData));
+        emit loginFailed(FailedType::DeviceMaxOnline);
     }
     else
     {
         emit errorOccurred(QStringLiteral("登录失败").append(replyData));
-        emit loginFailed();
+        emit loginFailed(FailedType::LoginError);
     }
     reply->deleteLater();
 }
