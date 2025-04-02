@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+namespace
+{
 // 辅助函数：计算一个 BigInt 的二进制位数
 int bitLength(const BigInt &n)
 {
@@ -182,6 +184,8 @@ std::string encryptedString(const RSAKeyPair &key, const std::string &s)
             j++;
         }
         // 进行 RSA 加密：加密块 = block^e mod m
+        // release 0.539s
+        // debug 15.047s
         BigInt crypt = modPow(block, key.e, key.m);
 
         // 将加密结果转换为真正的十六进制格式
@@ -223,6 +227,7 @@ std::string encryptedString(const RSAKeyPair &key, const std::string &s)
     }
     return result;
 }
+} // namespace
 
 RSAUtils::RSAUtils(QObject *parent)
     : QThread {parent}
