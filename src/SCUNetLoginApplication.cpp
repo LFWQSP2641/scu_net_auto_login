@@ -206,6 +206,7 @@ void SCUNetLoginApplication::setupConnections()
     {
         connect(m_loginer, &Loginer::loginSuccess, m_platformUtils, &PlatformUtils::openHotspots);
         connect(m_platformUtils, &PlatformUtils::openHotspotsFinished, this, &SCUNetLoginApplication::onOpenHotspotsFinished);
+        connect(m_platformUtils, &PlatformUtils::openHotspotsOutput, this, &SCUNetLoginApplication::outputHotspotMessage);
     }
     else
     {
@@ -254,6 +255,11 @@ void SCUNetLoginApplication::outputFatalError(const QString &error)
 {
     qCritical() << "\033[1;91m[致命错误]\033[0m " << error << Qt::endl;
     m_app->exit(1);
+}
+
+void SCUNetLoginApplication::outputHotspotMessage(const QString &message)
+{
+    outputMessage(QStringLiteral("热点输出脚本: ").append(message));
 }
 
 void SCUNetLoginApplication::onLoginFailed(Loginer::FailedType failedType)

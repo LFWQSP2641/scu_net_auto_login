@@ -32,6 +32,7 @@ protected slots:
     void outputMessage(const QString &message);
     void outputCoreMessage(const QString &message);
     void outputFatalError(const QString &error);
+    void outputHotspotMessage(const QString &message);
 
 private slots:
     void onLoginFailed(Loginer::FailedType failedType);
