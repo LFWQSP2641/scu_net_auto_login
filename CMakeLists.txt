@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(scu_net_auto_login VERSION 1.1.0 LANGUAGES CXX)
+project(scu_net_auto_login VERSION 1.1.1 LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Network)
