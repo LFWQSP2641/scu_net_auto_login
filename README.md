@@ -12,7 +12,7 @@ Python 暂不接受 feature request, PR welcome。
 
 - 四川大学江安校区的校园网使用锐捷ePortal Web 认证，使用不加密的 HTTP Post 方式进行登录。使用 RSA 零填充的方式加密密码。
 
-- 不建议将 `passwordEncrypt` 设置为 `false`，因为这样会将密码以明文的方式传输到校园网服务器上，可能会被网络攻击者窃取。
+- 不建议将 `passwordEncrypt` 设置为 `false`，因为这样会将密码以明文的方式传输到校园网服务器上，可能会被网络攻击者窃取，比如中间人攻击，伪造 Wi-Fi 等。
 
 - RSA 零填充的方式加密存在安全隐患。
 

@@ -7,7 +7,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-Q_GLOBAL_STATIC(Settings, singletonSettings)
+Settings *Settings::singletonSettings = nullptr;
+
+void Settings::initOnce()
+{
+    singletonSettings = new Settings;
+    singletonSettings->setObjectName(QStringLiteral("Settings"));
+}
 
 Settings *Settings::getSingletonSettings()
 {

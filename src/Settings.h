@@ -7,8 +7,8 @@ class Settings : public QObject
     Q_OBJECT
 
 public:
+    static void initOnce();
     static Settings *getSingletonSettings();
-    explicit Settings(QObject *parent = nullptr);
     ~Settings();
 
     QString username() const;
@@ -48,6 +48,9 @@ public slots:
     void loadSettings();
 
 protected:
+    static Settings *singletonSettings;
+    explicit Settings(QObject *parent = nullptr);
+
     QString m_username;
     QString m_password;
     QString m_service;
