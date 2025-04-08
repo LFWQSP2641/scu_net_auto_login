@@ -114,6 +114,7 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     {
         emit errorOccurred(QStringLiteral("无法获取必要数据"));
         emit loginFailed(FailedType::RedirectError);
+        return;
     }
 
     const QUrl loginPostUrl(QStringLiteral("eportal/InterFace.do?method=login").prepend(mainUrl));
@@ -237,7 +238,7 @@ void Loginer::onTcpSocketTimeOut()
 void Loginer::onTcpSocketDisconnected()
 {
     auto queryStr = extractQueryString();
-    if (!queryStr.has_value())
+    if ((!queryStr.has_value()) && tcpTimeOutTimer->isActive())
     {
         emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
         emit loginFailed(FailedType::Unknown);
