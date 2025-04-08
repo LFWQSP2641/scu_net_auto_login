@@ -25,7 +25,8 @@ Loginer::Loginer(QObject *parent)
       tcpTimeOutTimer(new QTimer(this)),
       rsaUtils(new RSAUtils(this)),
       tcpHeaderComplete(false),
-      tcpContentLength(-1)
+      tcpContentLength(-1),
+      m_isRunning(false)
 {
     netManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
     netManager->setProxy(QNetworkProxy::NoProxy);
@@ -52,11 +53,13 @@ Loginer::~Loginer()
 
 void Loginer::login(const QString &username, const QString &password, const QString &service)
 {
+    m_isRunning = true;
     m_username = username.toUtf8();
     m_password = password;
     m_serviceCode = serviceCodeMap.value(service);
-    if (m_serviceCode.isEmpty())
+    if (m_serviceCode.isEmpty() && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("不支持的服务商: ") + service);
         emit loginFailed(FailedType::UserInputError);
         return;
@@ -110,8 +113,9 @@ void Loginer::getQuery()
 
 void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
 {
-    if (!query)
+    if ((!query) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("无法获取必要数据"));
         emit loginFailed(FailedType::RedirectError);
         return;
@@ -155,8 +159,9 @@ void Loginer::clearAllCookies()
 void Loginer::getRedirectInfo(QNetworkReply *reply)
 {
     const QUrl firstUrl = reply->url();
-    if (firstUrl.toString().contains(QByteArrayLiteral("success.jsp")))
+    if (firstUrl.toString().contains(QByteArrayLiteral("success.jsp")) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("已登录，无法在登录状态下获取必要数据"));
         emit loginSuccess();
         return;
@@ -220,8 +225,9 @@ void Loginer::onTcpSocketReadyRead()
 
 void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
 {
-    if (socketError != QAbstractSocket::RemoteHostClosedError)
+    if ((socketError != QAbstractSocket::RemoteHostClosedError) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(socket->errorString());
         emit loginFailed(FailedType::NetworkError);
     }
@@ -230,16 +236,21 @@ void Loginer::onTcpSocketError(QAbstractSocket::SocketError socketError)
 
 void Loginer::onTcpSocketTimeOut()
 {
-    emit errorOccurred(QStringLiteral("请求超时"));
-    emit loginFailed(FailedType::TimeoutError);
+    if (m_isRunning)
+    {
+        m_isRunning = false;
+        emit errorOccurred(QStringLiteral("请求超时"));
+        emit loginFailed(FailedType::TimeoutError);
+    }
     socket->close();
 }
 
 void Loginer::onTcpSocketDisconnected()
 {
     auto queryStr = extractQueryString();
-    if ((!queryStr.has_value()) && tcpTimeOutTimer->isActive())
+    if ((!queryStr.has_value()) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("无法从页面提取登录参数"));
         emit loginFailed(FailedType::Unknown);
         return;
@@ -257,23 +268,27 @@ void Loginer::onLoginRequestFinished(QNetworkReply *reply)
 {
     const auto replyData = reply->readAll();
 
-    if (replyData.contains(QByteArrayLiteral("\"result\":\"success\"")))
+    if (replyData.contains(QByteArrayLiteral("\"result\":\"success\"")) && m_isRunning)
     {
+        m_isRunning = false;
         emit messageReceived(QStringLiteral("登录成功"));
         emit loginSuccess();
     }
-    else if (replyData.contains(QByteArrayLiteral("\"message\":\"验证码错误.\"")))
+    else if (replyData.contains(QByteArrayLiteral("\"message\":\"验证码错误.\"")) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("触发风控").append(replyData));
         emit loginFailed(FailedType::RiskControl);
     }
-    else if (replyData.contains(QByteArrayLiteral("\"message\":\"你使用的账号已达到同时在线用户数量上限!\"")))
+    else if (replyData.contains(QByteArrayLiteral("\"message\":\"你使用的账号已达到同时在线用户数量上限!\"")) && m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("已达到同时在线用户数量上限").append(replyData));
         emit loginFailed(FailedType::DeviceMaxOnline);
     }
-    else
+    else if (m_isRunning)
     {
+        m_isRunning = false;
         emit errorOccurred(QStringLiteral("登录失败").append(replyData));
         emit loginFailed(FailedType::LoginError);
     }

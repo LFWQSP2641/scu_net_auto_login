@@ -18,7 +18,8 @@ SCUNetLoginApplication::SCUNetLoginApplication(QCoreApplication *app)
       m_enableHotspot {false},
       m_enableConnectSCUNETWifi {false},
       m_tryAutoTick {false},
-      m_currentRetry {0}
+      m_currentRetry {0},
+      m_retryInProgress {false}
 {
 }
 
@@ -264,6 +265,10 @@ void SCUNetLoginApplication::outputHotspotMessage(const QString &message)
 
 void SCUNetLoginApplication::onLoginFailed(Loginer::FailedType failedType)
 {
+    // 如果已经在处理重试，则直接返回，防止重复触发
+    if (m_retryInProgress)
+        return;
+
     if (failedType == Loginer::FailedType::DeviceMaxOnline && Settings::getSingletonSettings()->enableAutoTick() && !m_tryAutoTick)
     {
         m_autoTickDevice->tickDevice();
@@ -276,11 +281,17 @@ void SCUNetLoginApplication::onLoginFailed(Loginer::FailedType failedType)
     {
         m_currentRetry++;
         outputMessage(QStringLiteral("登录失败，第").append(QString::number(m_currentRetry)).append(QStringLiteral("次重试，")).append(QString::number(static_cast<double>(m_retryDelay) / double(1000))).append(QStringLiteral("秒后重试...")));
+
+        // 设置重试标志
+        m_retryInProgress = true;
+
         // 延迟后重试
         QTimer::singleShot(m_retryDelay, this, [this]()
                            {
                                outputMessage(QStringLiteral("正在重新尝试登录..."));
-                               invokeLogin(); });
+                               invokeLogin();
+                               // 重置重试标志
+                               m_retryInProgress = false; });
     }
 }
 

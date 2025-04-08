@@ -75,6 +75,8 @@ protected:
 
     RSAUtils *rsaUtils;
 
+    bool m_isRunning;
+
 signals:
     void messageReceived(const QString &message);
     void errorOccurred(const QString &error);

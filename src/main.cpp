@@ -49,8 +49,11 @@ void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const Q
                                    .arg(currentTime, level, threadId, msg);
 
     // 输出到终端
-    fprintf(stderr, "%s\n", formattedMessage.toLocal8Bit().constData());
-    fflush(stderr);
+    auto s = stderr;
+    if (type == QtDebugMsg || type == QtInfoMsg)
+        s = stdout;
+    fprintf(s, "%s\n", formattedMessage.toLocal8Bit().constData());
+    fflush(s);
 
     // 输出到文件
     if (logFile.isOpen())

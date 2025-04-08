@@ -61,5 +61,7 @@ protected:
     // 当前重试次数
     int m_currentRetry;
 
+    bool m_retryInProgress;
+
 signals:
 };
