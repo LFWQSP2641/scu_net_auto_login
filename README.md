@@ -122,6 +122,8 @@
 - [x] 使用绕过校园网认证方式访问川大微服务
 - [ ] C++版本UI开发（[投票讨论](https://github.com/LFWQSP2641/scu_net_auto_login/discussions/1)）
 
-## 特别感谢
+## License
 
-[faheel/BigInt](https://github.com/faheel/BigInt) - 提供大数运算实现，感谢作者的辛勤付出。
+This project is licensed under the MIT License, except for the Mini-GMP library, which is licensed under the GNU Lesser General Public License (LGPL) v3. See thirdparty/mini-gmp/COPYING.LESSER for details.
+
+The Mini-GMP source code is included in thirdparty/mini-gmp/ and is available from https://gmplib.org/.
