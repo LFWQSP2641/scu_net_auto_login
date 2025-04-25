@@ -91,8 +91,24 @@ bool SCUNetLoginApplication::initialize(int argc, char *argv[])
                                        "true");
     m_parser.addOption(useConfigOption);
 
+    QCommandLineOption aboutOption(QStringList() << "about" << "license",
+                                   "显示许可证和作者信息");
+    m_parser.addOption(aboutOption);
+
     // 解析命令行参数
     m_parser.process(*m_app);
+
+    if (m_parser.isSet("about") || m_parser.isSet("license"))
+    {
+        qInfo() << "SCU Net Auto Login";
+        qInfo() << "Copyright (c) 2025 LFWQSP2641";
+        qInfo() << "Author: LFWQSP2641";
+        qInfo() << "License: MIT License";
+        qInfo() << "This project is licensed under the MIT License, except for the Mini-GMP library,";
+        qInfo() << "which is licensed under the GNU LGPL v3. See thirdparty/mini-gmp/COPYING.LESSER for details.";
+        m_app->exit(0);
+        return false;
+    }
 
     if (!parseCommandLine())
     {
