@@ -31,43 +31,17 @@ Settings::~Settings()
     saveSettings();
 }
 
-QString Settings::username() const
+QList<User> Settings::userList() const
 {
-    return m_username;
+    return m_userList;
 }
 
-void Settings::setUsername(const QString &newUsername)
+void Settings::setUserList(const QList<User> &newUserList)
 {
-    if (m_username == newUsername)
+    if (m_userList == newUserList)
         return;
-    m_username = newUsername;
-    emit usernameChanged();
-}
-
-QString Settings::password() const
-{
-    return m_password;
-}
-
-void Settings::setPassword(const QString &newPassword)
-{
-    if (m_password == newPassword)
-        return;
-    m_password = newPassword;
-    emit passwordChanged();
-}
-
-QString Settings::service() const
-{
-    return m_service;
-}
-
-void Settings::setService(const QString &newService)
-{
-    if (m_service == newService)
-        return;
-    m_service = newService;
-    emit serviceChanged();
+    m_userList = newUserList;
+    emit userListChanged();
 }
 
 int Settings::retryCount() const
@@ -229,9 +203,16 @@ void Settings::setBypassCampusNetworkSocks5Proxy(bool newBypassCampusNetworkSock
 void Settings::saveSettings() const
 {
     QJsonObject settingJsonObject;
-    settingJsonObject.insert(QStringLiteral("username"), m_username);
-    settingJsonObject.insert(QStringLiteral("password"), m_password);
-    settingJsonObject.insert(QStringLiteral("service"), m_service);
+    QJsonArray userListJsonArray;
+    for (const auto &user : m_userList)
+    {
+        QJsonObject userJsonObject;
+        userJsonObject.insert(QStringLiteral("username"), user.m_username);
+        userJsonObject.insert(QStringLiteral("password"), user.m_password);
+        userJsonObject.insert(QStringLiteral("service"), user.m_service);
+        userListJsonArray.append(userJsonObject);
+    }
+    settingJsonObject.insert(QStringLiteral("userList"), userListJsonArray);
     settingJsonObject.insert(QStringLiteral("retryCount"), m_retryCount);
     settingJsonObject.insert(QStringLiteral("retryDelay"), m_retryDelay);
     settingJsonObject.insert(QStringLiteral("initialDelay"), m_initialDelay);
@@ -273,9 +254,25 @@ void Settings::loadSettings()
 
     const auto settingJsonObject {QJsonDocument::fromJson(fileData).object()};
 
-    m_username = settingJsonObject.value(QStringLiteral("username")).toString();
-    m_password = settingJsonObject.value(QStringLiteral("password")).toString();
-    m_service = settingJsonObject.value(QStringLiteral("service")).toString();
+    const auto userListJsonArray {settingJsonObject.value(QStringLiteral("userList")).toArray()};
+    for (const auto &userJsonObject : userListJsonArray)
+    {
+        User user;
+        const auto userObject {userJsonObject.toObject()};
+        user.m_username = userObject.value(QStringLiteral("username")).toString();
+        user.m_password = userObject.value(QStringLiteral("password")).toString();
+        user.m_service = userObject.value(QStringLiteral("service")).toString();
+        m_userList.append(user);
+    }
+
+    if (settingJsonObject.contains(QStringLiteral("username")))
+    {
+        User user;
+        user.m_username = settingJsonObject.value(QStringLiteral("username")).toString();
+        user.m_password = settingJsonObject.value(QStringLiteral("password")).toString();
+        user.m_service = settingJsonObject.value(QStringLiteral("service")).toString();
+        m_userList.append(user);
+    }
     m_retryCount = settingJsonObject.value(QStringLiteral("retryCount")).toInt(0);
     m_retryDelay = settingJsonObject.value(QStringLiteral("retryDelay")).toInt(5);
     m_initialDelay = settingJsonObject.value(QStringLiteral("initialDelay")).toInt(0);

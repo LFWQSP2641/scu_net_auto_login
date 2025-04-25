@@ -89,7 +89,9 @@ void PlatformUtils::openHotspots()
 #endif
     connect(m_openHotspotsProcess, &QProcess::finished, this, &PlatformUtils::onOpenHotspotsFinished);
     connect(m_openHotspotsProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit openHotspotsOutput(m_openHotspotsProcess->readAllStandardOutput()); });
+    {
+        emit openHotspotsOutput(m_openHotspotsProcess->readAllStandardOutput());
+    });
 }
 
 void PlatformUtils::connectSCUNETWifi()
@@ -98,7 +100,7 @@ void PlatformUtils::connectSCUNETWifi()
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
     // 只有在Mac和Linux下才需要获取接口
     connect(this, &PlatformUtils::wifiInterfaceFound, this, [this](const QString &interface)
-            {
+    {
         // 断开连接，避免多次调用
         disconnect(this, &PlatformUtils::wifiInterfaceFound, this, nullptr);
 
@@ -106,14 +108,16 @@ void PlatformUtils::connectSCUNETWifi()
         m_connectSCUNETWifiProcess->setProcessChannelMode(QProcess::MergedChannels);
 
 #if defined(Q_OS_LINUX)
-        if (!interface.isEmpty()) {
+        if (!interface.isEmpty())
+        {
             m_connectSCUNETWifiProcess->start("nmcli", QStringList() << "device"
                                                                      << "wifi"
                                                                      << "connect"
                                                                      << "SCUNET"
-                                                                     << "ifname"
-                                                                     << interface);
-        } else {
+                                                                     << "ifname" << interface);
+        }
+        else
+        {
             m_connectSCUNETWifiProcess->start("nmcli", QStringList() << "device"
                                                                      << "wifi"
                                                                      << "connect"
@@ -121,13 +125,14 @@ void PlatformUtils::connectSCUNETWifi()
         }
 #elif defined(Q_OS_MAC)
         QString wifiInterface = interface.isEmpty() ? "en0" : interface;
-        m_connectSCUNETWifiProcess->start("networksetup", QStringList() << "-setairportnetwork"
-                                                                        << wifiInterface
-                                                                        << "SCUNET");
+        m_connectSCUNETWifiProcess->start("networksetup", QStringList() << "-setairportnetwork" << wifiInterface << "SCUNET");
 #endif
         connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
         connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
-                { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); }); });
+        {
+            emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput());
+        });
+    });
 
     // 开始异步获取WiFi接口
     getWifiInterface();
@@ -140,7 +145,9 @@ void PlatformUtils::connectSCUNETWifi()
                                                              << "name=\"SCUNET\"");
     connect(m_connectSCUNETWifiProcess, &QProcess::finished, this, &PlatformUtils::onConnectSCUNETWifiFinished);
     connect(m_connectSCUNETWifiProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput()); });
+    {
+        emit connectSCUNETWifiOutput(m_connectSCUNETWifiProcess->readAllStandardOutput());
+    });
 #endif
 }
 
@@ -287,7 +294,9 @@ void PlatformUtils::processWifiInterfaceOutput()
     {
         QStringList lines = output.split('\n', Qt::SkipEmptyParts);
         auto it = std::find_if(lines.begin(), lines.end(), [](const QString &line)
-                               { return line.contains("wifi"); });
+        {
+            return line.contains("wifi");
+        });
         if (it != lines.end())
         {
             QStringList parts = it->split(':', Qt::SkipEmptyParts);
@@ -302,7 +311,9 @@ void PlatformUtils::processWifiInterfaceOutput()
     {
         QStringList lines = output.split('\n', Qt::SkipEmptyParts);
         auto it = std::find_if(lines.begin(), lines.end(), [](const QString &line)
-                               { return line.contains("IEEE 802.11") || line.contains("ESSID:"); });
+        {
+            return line.contains("IEEE 802.11") || line.contains("ESSID:");
+        });
         if (it != lines.end())
         {
             m_foundInterface = it->split(' ').first();

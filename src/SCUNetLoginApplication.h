@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Loginer.h"
+#include "User.h"
 
 #include <QCommandLineParser>
 #include <QObject>
@@ -57,6 +58,12 @@ protected:
     bool m_enableHotspot;
     bool m_enableConnectSCUNETWifi;
     bool m_tryAutoTick;
+
+    // 多用户支持
+    QList<User> m_userList;    // 用户列表
+    int m_currentUserIndex;    // 当前尝试的用户索引
+    bool m_hasCommandLineUser; // 是否有命令行指定的用户
+    bool m_tickAttempted;      // 是否已尝试踢出设备
 
     // 当前重试次数
     int m_currentRetry;

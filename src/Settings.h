@@ -1,5 +1,7 @@
 #pragma once
 
+#include "User.h"
+
 #include <QObject>
 
 class Settings : public QObject
@@ -11,12 +13,8 @@ public:
     static Settings *getSingletonSettings();
     ~Settings();
 
-    QString username() const;
-    void setUsername(const QString &newUsername);
-    QString password() const;
-    void setPassword(const QString &newPassword);
-    QString service() const;
-    void setService(const QString &newService);
+    QList<User> userList() const;
+    void setUserList(const QList<User> &newUserList);
     int retryCount() const;
     void setRetryCount(int newRetryCount);
     int retryDelay() const;
@@ -39,7 +37,6 @@ public:
     void setCookieUUkey(const QString &newCookieUUkey);
     QString cookieEaiSess() const;
     void setCookieEaiSess(const QString &newCookieEaiSess);
-
     bool bypassCampusNetworkSocks5Proxy() const;
     void setBypassCampusNetworkSocks5Proxy(bool newBypassCampusNetworkSocks5Proxy);
 
@@ -51,9 +48,7 @@ protected:
     static Settings *singletonSettings;
     explicit Settings(QObject *parent = nullptr);
 
-    QString m_username;
-    QString m_password;
-    QString m_service;
+    QList<User> m_userList;
     int m_retryCount;
     int m_retryDelay;
     int m_initialDelay;
@@ -72,9 +67,7 @@ protected:
     bool m_bypassCampusNetworkSocks5Proxy;
 
 signals:
-    void usernameChanged();
-    void passwordChanged();
-    void serviceChanged();
+    void userListChanged();
     void retryCountChanged();
     void retryDelayChanged();
     void initialDelayChanged();
@@ -86,13 +79,10 @@ signals:
     void enableAutoTickChanged();
     void cookieUUkeyChanged();
     void cookieEaiSessChanged();
-
     void bypassCampusNetworkSocks5ProxyChanged();
 
 private:
-    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged FINAL)
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged FINAL)
-    Q_PROPERTY(QString service READ service WRITE setService NOTIFY serviceChanged FINAL)
+    Q_PROPERTY(QList<User> userList READ userList WRITE setUserList NOTIFY userListChanged FINAL)
     Q_PROPERTY(int retryCount READ retryCount WRITE setRetryCount NOTIFY retryCountChanged FINAL)
     Q_PROPERTY(int retryDelay READ retryDelay WRITE setRetryDelay NOTIFY retryDelayChanged FINAL)
     Q_PROPERTY(int initialDelay READ initialDelay WRITE setInitialDelay NOTIFY initialDelayChanged FINAL)

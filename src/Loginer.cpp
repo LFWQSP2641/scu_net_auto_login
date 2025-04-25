@@ -108,7 +108,9 @@ void Loginer::getQuery()
     setRequestHeaders(request);
     QNetworkReply *reply = netManager->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]
-            { emit this->firstRedirectedFinished(reply); });
+    {
+        emit this->firstRedirectedFinished(reply);
+    });
 }
 
 void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
@@ -138,7 +140,9 @@ void Loginer::sendLoginRequest(const QByteArray &encryptedPassword)
     clearAllCookies();
     QNetworkReply *reply = netManager->post(request, loginPostData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, &QNetworkReply::finished, this, [this, reply]
-            { this->onLoginRequestFinished(reply); });
+    {
+        this->onLoginRequestFinished(reply);
+    });
 
     emit messageReceived(QStringLiteral("正在登录。。。"));
 }

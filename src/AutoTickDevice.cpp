@@ -46,7 +46,9 @@ AutoTickDevice::AutoTickDevice(QObject *parent)
 
     connect(byPassNetworkCoreProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &AutoTickDevice::onStartByPassNetworkCoreFinished);
     connect(byPassNetworkCoreProcess, &QProcess::readyReadStandardOutput, this, [this]
-            { emit coreOutput(byPassNetworkCoreProcess->readAllStandardOutput()); });
+    {
+        emit coreOutput(byPassNetworkCoreProcess->readAllStandardOutput());
+    });
 }
 
 AutoTickDevice::~AutoTickDevice()
@@ -75,7 +77,9 @@ void AutoTickDevice::getDeviceStatus()
 
     auto reply = netManager->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]
-            { this->onGetDeviceStatusFinished(reply); });
+    {
+        this->onGetDeviceStatusFinished(reply);
+    });
 }
 
 void AutoTickDevice::sentTickRequest()
@@ -93,7 +97,9 @@ void AutoTickDevice::sentTickRequest()
 
     auto reply = netManager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply, &QNetworkReply::finished, this, [this, reply]
-            { this->onSentTickRequestFinished(reply); });
+    {
+        this->onSentTickRequestFinished(reply);
+    });
 }
 
 void AutoTickDevice::setRequestHeaders(QNetworkRequest &request)
@@ -117,7 +123,9 @@ void AutoTickDevice::checkByPassNetworkCore()
 
     auto reply = netManager->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]
-            { this->onCheckByPassNetworkCoreFinished(reply); });
+    {
+        this->onCheckByPassNetworkCoreFinished(reply);
+    });
 }
 
 void AutoTickDevice::onStartByPassNetworkCoreFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -143,7 +151,6 @@ void AutoTickDevice::onGetDeviceStatusFinished(QNetworkReply *reply)
     }
 
     const auto replyData = reply->readAll();
-    bool success = false;
     QJsonObject replyJson = QJsonDocument::fromJson(replyData).object();
     QJsonObject dJson = replyJson.value(QStringLiteral("d")).toObject();
     QJsonArray deviceListJson = dJson.value(QStringLiteral("list")).toArray();

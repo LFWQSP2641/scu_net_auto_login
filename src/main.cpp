@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
     // 初始化全局设置
     Global::initOnce();
     Settings::initOnce();
+    Settings::getSingletonSettings()->saveSettings();
 
     SCUNetLoginApplication app(&a);
     if (!app.initialize(argc, argv))

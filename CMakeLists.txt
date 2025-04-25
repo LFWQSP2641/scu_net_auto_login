@@ -12,6 +12,7 @@ qt_add_executable(scu_net_auto_login
     src/main.cpp
     src/BigInt.hpp
     src/Loginer.h src/Loginer.cpp
+    src/User.h src/User.cpp
     src/RSAUtils.h src/RSAUtils.cpp
     src/PlatformUtils.h src/PlatformUtils.cpp
     src/Global.h src/Global.cpp

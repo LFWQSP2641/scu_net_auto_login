@@ -19,7 +19,10 @@ SCUNetLoginApplication::SCUNetLoginApplication(QCoreApplication *app)
       m_enableConnectSCUNETWifi {false},
       m_tryAutoTick {false},
       m_currentRetry {0},
-      m_retryInProgress {false}
+      m_retryInProgress {false},
+      m_currentUserIndex {0},
+      m_hasCommandLineUser {false},
+      m_tickAttempted {false}
 {
 }
 
@@ -123,14 +126,46 @@ void SCUNetLoginApplication::loadConfiguration()
 {
     const bool useConfig = m_parser.value("use-config").toLower() == "true";
 
+    // 首先加载命令行参数
+    m_hasCommandLineUser = m_parser.isSet("username") && m_parser.isSet("password") && m_parser.isSet("service");
+
+    if (m_hasCommandLineUser)
+    {
+        // 如果命令行参数完整，创建一个用户放在列表首位
+        m_username = m_parser.value("username");
+        m_password = m_parser.value("password");
+        m_service = m_parser.value("service");
+
+        // 创建命令行指定的用户
+        User commandLineUser;
+        commandLineUser.username() = m_username;
+        commandLineUser.password() = m_password;
+        commandLineUser.service() = m_service;
+
+        m_userList.clear();
+        m_userList.append(commandLineUser);
+    }
+
     if (useConfig)
     {
         qDebug() << "\033[1;92m[信息]\033[0m 正在从配置文件加载参数..." << Qt::endl;
 
-        // 从配置文件加载参数
-        m_username = m_parser.isSet("username") ? m_parser.value("username") : Settings::getSingletonSettings()->username();
-        m_password = m_parser.isSet("password") ? m_parser.value("password") : Settings::getSingletonSettings()->password();
-        m_service = m_parser.isSet("service") ? m_parser.value("service") : Settings::getSingletonSettings()->service();
+        // 如果没有命令行用户或使用配置，添加配置文件中的用户
+        if (!m_hasCommandLineUser)
+        {
+            // 加载用户列表
+            m_userList = Settings::getSingletonSettings()->userList();
+
+            // 如果有用户，将第一个用户设为当前用户
+            if (!m_userList.isEmpty())
+            {
+                m_username = m_userList.first().username();
+                m_password = m_userList.first().password();
+                m_service = m_userList.first().service();
+            }
+        }
+
+        // 加载其他配置项
         m_retryCount = m_parser.isSet("retry-count") ? m_parser.value("retry-count").toInt() : Settings::getSingletonSettings()->retryCount();
         m_retryDelay = m_parser.isSet("retry-delay") ? m_parser.value("retry-delay").toDouble() * 1000 : Settings::getSingletonSettings()->retryDelay();
         m_initialDelay = m_parser.isSet("initial-delay") ? m_parser.value("initial-delay").toDouble() * 1000 : Settings::getSingletonSettings()->initialDelay();
@@ -139,50 +174,68 @@ void SCUNetLoginApplication::loadConfiguration()
     }
     else
     {
-        qDebug() << "\033[1;92m[信息]\033[0m 未使用配置文件，所有参数需从命令行提供" << Qt::endl;
+        qDebug() << "\033[1;92m[信息]\033[0m 未使用配置文件，所有参数从命令行提供" << Qt::endl;
 
-        // 从命令行加载参数
-        m_username = m_parser.value("username");
-        m_password = m_parser.value("password");
-        m_service = m_parser.value("service");
+        if (!m_hasCommandLineUser)
+        {
+            // 如果未指定完整用户信息但明确不使用配置文件，则清空用户列表
+            m_userList.clear();
+        }
+
+        // 从命令行加载其他参数
         m_retryCount = m_parser.value("retry-count").toInt();
         m_retryDelay = m_parser.value("retry-delay").toDouble() * 1000;
         m_initialDelay = m_parser.value("initial-delay").toDouble() * 1000;
         m_enableHotspot = m_parser.isSet("hotspot");
         m_enableConnectSCUNETWifi = m_parser.isSet("connect");
     }
+
+    // 重置多用户登录状态
+    m_currentUserIndex = 0;
+    m_tickAttempted = false;
 }
 
 bool SCUNetLoginApplication::validateConfiguration()
 {
-    // 检查必要参数
-    if (m_username.isEmpty())
+    // 检查是否至少有一个用户
+    if (m_userList.isEmpty())
     {
-        outputError(QStringLiteral("必须提供用户名参数 (-u, --username)"));
+        outputError(QStringLiteral("未提供任何有效的用户信息"));
         return false;
     }
 
-    if (m_password.isEmpty())
-    {
-        outputError(QStringLiteral("必须提供密码参数 (-p, --password)"));
-        return false;
-    }
+    // 检查每个用户配置是否有效
+    const QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
 
-    if (m_service.isEmpty())
+    return std::all_of(m_userList.cbegin(), m_userList.cend(), [this, &validServices](const User &user)
     {
-        outputError(QStringLiteral("必须提供服务类型参数 (-s, --service)"));
-        return false;
-    }
+        if (user.username().isEmpty())
+        {
+            outputError(QStringLiteral("有用户缺少用户名"));
+            return false;
+        }
 
-    // 验证服务类型
-    QStringList validServices = {"CHINATELECOM", "CHINAMOBILE", "CHINAUNICOM", "EDUNET"};
-    if (!validServices.contains(m_service))
-    {
-        outputError(QStringLiteral("无效的服务类型。请使用: CHINATELECOM, CHINAMOBILE, CHINAUNICOM, EDUNET"));
-        return false;
-    }
+        if (user.password().isEmpty())
+        {
+            outputError(QStringLiteral("用户 ") + user.username() + QStringLiteral(" 缺少密码"));
+            return false;
+        }
 
-    return true;
+        if (user.service().isEmpty())
+        {
+            outputError(QStringLiteral("用户 ") + user.username() + QStringLiteral(" 缺少服务类型"));
+            return false;
+        }
+
+        // 验证服务类型
+        if (!validServices.contains(user.service()))
+        {
+            outputError(QStringLiteral("用户 ") + user.username() + QStringLiteral(" 有无效的服务类型。请使用: CHINATELECOM, CHINAMOBILE, CHINAUNICOM, EDUNET"));
+            return false;
+        }
+
+        return true;
+    });
 }
 
 void SCUNetLoginApplication::setupConnections()
@@ -198,10 +251,18 @@ void SCUNetLoginApplication::setupConnections()
 
     connect(m_autoTickDevice, &AutoTickDevice::coreOutput, this, &SCUNetLoginApplication::outputCoreMessage);
 
-    connect(m_autoTickDevice, &AutoTickDevice::tickSuccess, this, &SCUNetLoginApplication::invokeLogin);
+    connect(m_autoTickDevice, &AutoTickDevice::tickSuccess, this, [this]()
+    {
+        outputMessage(QStringLiteral("踢出在线设备成功，重新尝试登录..."));
+        // 重置用户索引，从第一个用户重新开始尝试
+        m_currentUserIndex = 0;
+        invokeLogin();
+    });
 
     connect(m_autoTickDevice, &AutoTickDevice::tickFailed, m_app, [this]()
-            { outputFatalError(QStringLiteral("踢出设备失败")); });
+    {
+        outputFatalError(QStringLiteral("踢出设备失败"));
+    });
 
     if (m_enableHotspot)
     {
@@ -219,7 +280,29 @@ void SCUNetLoginApplication::setupConnections()
 
 void SCUNetLoginApplication::invokeLogin()
 {
-    m_loginer->login(m_username, m_password, m_service);
+    if (m_currentUserIndex < m_userList.size())
+    {
+        // 使用当前用户尝试登录
+        User currentUser = m_userList[m_currentUserIndex];
+        outputMessage(QStringLiteral("正在尝试登录用户: ").append(currentUser.username()).append(QStringLiteral(" (")).append(currentUser.service()).append(QStringLiteral(")")));
+        m_loginer->login(currentUser.username(), currentUser.password(), currentUser.service());
+    }
+    else
+    {
+        // 所有用户都已尝试登录
+        if (!m_tickAttempted)
+        {
+            // 如果还没有尝试过踢出设备，现在尝试
+            outputMessage(QStringLiteral("所有用户登录尝试都失败，尝试踢出在线设备..."));
+            m_tickAttempted = true;
+            m_autoTickDevice->tickDevice();
+        }
+        else
+        {
+            // 已经尝试过踢出设备，登录彻底失败
+            outputFatalError(QStringLiteral("所有登录尝试均失败，包括踢出设备后的重试"));
+        }
+    }
 }
 
 void SCUNetLoginApplication::startLogin(int delay)
@@ -269,10 +352,23 @@ void SCUNetLoginApplication::onLoginFailed(Loginer::FailedType failedType)
     if (m_retryInProgress)
         return;
 
-    if (failedType == Loginer::FailedType::DeviceMaxOnline && Settings::getSingletonSettings()->enableAutoTick() && !m_tryAutoTick)
+    // 如果尚未尝试所有用户，则尝试下一个用户
+    if (m_currentUserIndex < m_userList.size() - 1)
     {
+        m_currentUserIndex++;
+        outputMessage(QStringLiteral("登录失败，尝试下一个用户..."));
+        invokeLogin();
+        return;
+    }
+
+    // 已尝试最后一个用户，检查是否要尝试踢出设备
+    if (failedType == Loginer::FailedType::DeviceMaxOnline &&
+        Settings::getSingletonSettings()->enableAutoTick() &&
+        !m_tickAttempted)
+    {
+        outputMessage(QStringLiteral("设备数量已达上限，尝试踢出在线设备..."));
         m_autoTickDevice->tickDevice();
-        m_tryAutoTick = true;
+        m_tickAttempted = true;
         return;
     }
 
@@ -285,13 +381,17 @@ void SCUNetLoginApplication::onLoginFailed(Loginer::FailedType failedType)
         // 设置重试标志
         m_retryInProgress = true;
 
+        // 重置用户索引，从第一个用户开始重试
+        m_currentUserIndex = 0;
+
         // 延迟后重试
         QTimer::singleShot(m_retryDelay, this, [this]()
-                           {
-                               outputMessage(QStringLiteral("正在重新尝试登录..."));
-                               invokeLogin();
-                               // 重置重试标志
-                               m_retryInProgress = false; });
+        {
+            outputMessage(QStringLiteral("正在重新尝试登录..."));
+            invokeLogin();
+            // 重置重试标志
+            m_retryInProgress = false;
+        });
     }
 }
 
@@ -299,12 +399,12 @@ void SCUNetLoginApplication::onOpenHotspotsFinished(int exitCode, QProcess::Exit
 {
     if (exitStatus == QProcess::NormalExit && exitCode == 0)
     {
-        qDebug() << "\033[1;92m[信息]\033[0m 热点已开启" << Qt::endl;
+        qDebug() << "\033[1;92m[信息]\033[0m 开启热点脚本运行完成" << Qt::endl;
         m_app->exit(0);
     }
     else
     {
-        qWarning() << "\033[1;91m[错误]\033[0m 开启热点失败" << Qt::endl;
+        qWarning() << "\033[1;91m[错误]\033[0m 无法运行热点脚本，请检查杀毒软件" << Qt::endl;
         m_app->exit(1);
     }
 }
