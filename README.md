@@ -124,6 +124,6 @@
 
 ## License
 
-This project is licensed under the MIT License, except for the Mini-GMP library, which is licensed under the GNU Lesser General Public License (LGPL) v3. See thirdparty/mini-gmp/COPYING.LESSER for details.
+This project is licensed under the MIT License, except for the Mini-GMP library, which is licensed under the GNU Lesser General Public License (LGPL) v3. See thirdparty/mini-gmp/COPYING.LESSERv3 for details.
 
 The Mini-GMP source code is included in thirdparty/mini-gmp/ and is available from https://gmplib.org/.
