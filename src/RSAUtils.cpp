@@ -4,7 +4,7 @@
 
 #include <QByteArray>
 #include <QString>
-#include <algorithm> // 使用std::reverse
+#include <algorithm>
 
 namespace
 {
@@ -89,11 +89,13 @@ QString encryptedString_gmp(const QString &eHex, const QString &modulusHex, cons
         QByteArray hexBuffer(bufSize, '\0');
         mpz_get_str(hexBuffer.data(), 16, crypt);
 
-        // 修剪并确保偶数长度（字节对齐）- 修复前导零问题
+        // 创建不包含多余空字符的新QByteArray
+        hexBuffer = QByteArray(hexBuffer.constData()); // 自动到第一个\0截断
         hexBuffer = hexBuffer.trimmed();
+
         if (hexBuffer.size() % 2 == 1)
         {
-            hexBuffer.prepend('0'); // 正确地在当前块前添加前导零
+            hexBuffer.prepend('0');
         }
         resultBytes.append(hexBuffer);
 
@@ -159,5 +161,5 @@ void RSAUtils::syncEncryptedPassword(const QString &password, const QString &mac
 void RSAUtils::run()
 {
     m_encryptedPassword = encryptedPassword(m_password, m_mac);
-    emit encryptedPasswordReady(m_encryptedPassword);
+    emit encryptedPasswordFinished(m_encryptedPassword);
 }
