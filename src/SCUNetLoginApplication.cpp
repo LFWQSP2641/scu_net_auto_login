@@ -105,7 +105,7 @@ bool SCUNetLoginApplication::initialize(int argc, char *argv[])
         qInfo() << "Author: LFWQSP2641";
         qInfo() << "License: MIT License";
         qInfo() << "This project is licensed under the MIT License, except for the Mini-GMP library,";
-        qInfo() << "which is licensed under the GNU LGPL v3. See thirdparty/mini-gmp/COPYING.LESSER for details.";
+        qInfo() << "which is licensed under the GNU LGPL v3. See https://github.com/LFWQSP2641/scu_net_auto_login/blob/master/thirdparty/mini-gmp/COPYING.LESSERv3 for details.";
         m_app->exit(0);
         return false;
     }
