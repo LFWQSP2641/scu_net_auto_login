@@ -20,7 +20,7 @@ protected slots:
     void run() override;
 
 signals:
-    void encryptedPasswordReady(const QByteArray &encryptedPassword);
+    void encryptedPasswordFinished(const QByteArray &encryptedPassword);
 
 protected:
     QByteArray m_encryptedPassword;

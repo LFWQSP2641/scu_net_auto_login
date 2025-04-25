@@ -41,7 +41,7 @@ Loginer::Loginer(QObject *parent)
     connect(socket, &QTcpSocket::disconnected, tcpTimeOutTimer, &QTimer::stop);
     connect(tcpTimeOutTimer, &QTimer::timeout, this, &Loginer::onTcpSocketTimeOut);
     connect(socket, &QTcpSocket::disconnected, this, &Loginer::onTcpSocketDisconnected);
-    connect(rsaUtils, &RSAUtils::encryptedPasswordReady, this, &Loginer::sendLoginRequest);
+    connect(rsaUtils, &RSAUtils::encryptedPasswordFinished, this, &Loginer::sendLoginRequest);
     connect(socket, &QTcpSocket::connected, this, &Loginer::resetTcpState);
 }
 
