@@ -7,11 +7,66 @@
 #include <QFile>
 #include <QMutex>
 #include <QThread>
+#include <QTimer>
+#include <QFileInfo>
 
 namespace
 {
 QFile logFile("application.log");
 QMutex logMutex;
+
+// 日志文件最大大小（字节），默认 10MB
+constexpr qint64 MAX_LOG_SIZE = 10 * 1024 * 1024;  
+// 日志文件最大保留天数，默认 30 天
+constexpr int MAX_LOG_DAYS = 30;  
+
+// 检查并处理日志文件
+void checkAndRotateLogFile()
+{
+    QMutexLocker locker(&logMutex); // 加锁保证线程安全
+    
+    if (!logFile.exists())
+        return;
+        
+    QFileInfo fileInfo(logFile.fileName());
+    bool needRotate = false;
+    QString reason;
+    
+    // 检查文件大小
+    if (fileInfo.size() > MAX_LOG_SIZE) {
+        needRotate = true;
+        reason = QString("大小超过 %1 MB").arg(MAX_LOG_SIZE / (1024.0 * 1024.0), 0, 'f', 2);
+    }
+    
+    // 检查文件修改时间
+    QDateTime lastModified = fileInfo.lastModified();
+    int daysSinceModified = lastModified.daysTo(QDateTime::currentDateTime());
+    if (daysSinceModified > MAX_LOG_DAYS) {
+        needRotate = true;
+        reason = QString("日志文件已超过 %1 天未更新").arg(daysSinceModified);
+    }
+    
+    // 执行清理操作
+    if (needRotate) {
+        // 先关闭文件
+        if (logFile.isOpen()) {
+            logFile.close();
+        }
+        
+        // 创建备份文件名
+        QString backupName = QString("application_%1.log")
+            .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+            
+        // 记录一条消息
+        qInfo() << "执行日志文件轮转：" << reason;
+        
+        // 备份旧日志（可选）
+        QFile::rename(logFile.fileName(), backupName);
+        
+        // 重新打开日志文件
+        logFile.open(QIODevice::Append | QIODevice::Text);
+    }
+}
 
 void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -79,6 +134,16 @@ int main(int argc, char *argv[])
     {
         qWarning() << "无法打开日志文件";
     }
+
+    // 在安装消息处理程序之前先检查日志文件
+    checkAndRotateLogFile();
+
+    // 设置定时器定期检查日志文件
+    QTimer* logRotateTimer = new QTimer(&a);
+    // 每天检查一次日志文件
+    logRotateTimer->setInterval(24 * 60 * 60 * 1000);
+    QObject::connect(logRotateTimer, &QTimer::timeout, checkAndRotateLogFile);
+    logRotateTimer->start();
 
     qInstallMessageHandler(myMessageHandler);
 
