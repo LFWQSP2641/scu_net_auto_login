@@ -46,7 +46,7 @@ jobs:
       uses: lukka/get-cmake@latest
 
     - name: Install Qt
-      uses: Kidev/install-qt-action/action@v5 # temporary, for arm64
+      uses: Kidev/install-qt-action/action@v5 # temporary, for arm64, not supporting windows yet (TypeError: unsupported operand type(s) for |: 'type' and 'NoneType')
       with:
         cache: 'true'
         version: ${{ env.QT_VERSION }}
