@@ -1,6 +1,8 @@
 # SCU 校园网自动登录
 
-四川大学校园网自动登录工具（江安）
+四川大学校园网自动登录工具（ePortal Web）
+
+支持江安校区和华西校区 Web 认证。
 
 ## 项目概述
 
@@ -12,6 +14,17 @@
 > Python 版本暂不接受新功能请求，但欢迎提交 PR。
 
 ## 使用方法
+
+---
+
+### 第三方图形客户端
+
+特别感谢以下项目对本项目的支持，适配和拓展：
+
+- [Alswek123/scu-net-auto-login-gui](https://github.com/Alswek123/scu-net-auto-login-gui)
+  基于 Godot 引擎开发的跨平台图形界面，提供更友好的用户体验。
+
+---
 
 ### C++ 版本
 
@@ -109,18 +122,18 @@
 
 ## 技术说明
 
-- 四川大学江安校区校园网使用锐捷ePortal Web认证，通过HTTP Post方式登录，使用RSA零填充方式加密密码。
+- 四川大学江安校区校园网使用锐捷 ePortal Web 认证，通过HTTP Post方式登录，使用RSA零填充方式加密密码。
 
 - 不建议将`passwordEncrypt`设置为`false`，这会导致密码以明文方式传输，可能被网络攻击者窃取。
 
-- 校园网重写response策略特殊：通常访问`http://192.168.2.135`后会302重定向至`http://123.123.123.123`，但川大校园网对请求头`host:123.123.123.123`会直接断开TCP连接。由于Qt的QNetworkAccessManager会将请求头键名转为小写，导致无法正常工作，因此C++版本使用QTcpSocket手动构造HTTP请求。
+- 校园网重写response策略特殊：通常访问 `http://192.168.2.135` 后会302重定向至 `http://123.123.123.123`，但川大校园网对小写请求头 `host:123.123.123.123` 会直接断开TCP连接，其只允许大写请求头。同时由于 Qt 的 QNetworkAccessManager 会将请求头键名转为小写，导致无法正常工作，因此 C++ 版本使用 QTcpSocket 手动构造 HTTP 请求。
 
 ## 待办事项
 
-- [x] 调用系统连接SCUNET WiFi
+- [x] 调用系统连接 SCUNET WiFi
 - [x] 连接成功后自动开启移动热点
 - [x] 使用绕过校园网认证方式访问川大微服务
-- [ ] C++版本UI开发（[投票讨论](https://github.com/LFWQSP2641/scu_net_auto_login/discussions/1)）
+- [ ] C++ 版本 UI 开发（[投票讨论](https://github.com/LFWQSP2641/scu_net_auto_login/discussions/1)）
 
 ## License
 
