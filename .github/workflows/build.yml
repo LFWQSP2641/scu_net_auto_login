@@ -4,7 +4,7 @@ on: push
 
 env:
   BUILD_TYPE: Release
-  QT_VERSION: '6.8.3'
+  QT_VERSION: '6.11.0'
   PROJECT_NAME: scu_net_auto_login
   EXECUTABLE_NAME: scu_net_auto_login
 
@@ -40,7 +40,7 @@ jobs:
             cmake_generator: 'Ninja'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -79,23 +79,23 @@ jobs:
 
     - name: Upload executable (Windows Only)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.EXECUTABLE_NAME }}.exe
         path: build/Release/${{ env.EXECUTABLE_NAME }}.exe
-        compression-level: 0
+        archive: false
 
     - name: Upload build artifacts (Windows)
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
         path: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
-        compression-level: 0
+        archive: false
 
     - name: Release Package (Windows Only)
       if: matrix.os == 'windows-latest' && startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         files: |
           ${{github.workspace}}/${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
@@ -109,15 +109,15 @@ jobs:
 
     - name: Upload build artifacts (Linux/macOS)
       if: matrix.os != 'windows-latest'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
-        name: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}
+        name: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
         path: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
-        compression-level: 0
+        archive: false
 
     - name: Release Package (Linux/macOS)
       if: matrix.os != 'windows-latest' && startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         files: |
           ${{github.workspace}}/${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
