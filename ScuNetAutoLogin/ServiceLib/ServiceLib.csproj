@@ -23,7 +23,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
     <EmbeddedResource Include="Resource\HotspotScript" />
   </ItemGroup>
 
