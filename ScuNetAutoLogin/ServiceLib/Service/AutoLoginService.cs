@@ -1,4 +1,5 @@
 using ServiceLib.Data;
+using ServiceLib.Helper;
 using ServiceLib.Manager;
 using ServiceLib.Resx;
 
@@ -33,6 +34,25 @@ public class AutoLoginService
         var loginSuccess = false;
         var retryCount = config.RetryCount;
         retryCount = retryCount > 0 ? retryCount : 1;
+        if (config.ConnectSCUNETWifi)
+        {
+            foreach (var _ in Enumerable.Range(1, retryCount))
+            {
+                try
+                {
+                    if (await PlatformHelper.ConnectSCUNETWifi())
+                    {
+                        message.Add(ResStr.SCUNETWifiConnected);
+                        break;
+                    }
+                }
+                catch
+                {
+                    // Ignore
+                }
+            }
+        }
+        await Task.Delay(config.InitialDelayMs);
         foreach (var user in config.UserList)
         {
             foreach (var _ in Enumerable.Range(1, retryCount))
@@ -66,6 +86,26 @@ public class AutoLoginService
         if (loginSuccess)
         {
             message.Add(ResStr.AutoLoginSuccess);
+
+            if (config.EnableHotspot)
+            {
+                foreach (var _ in Enumerable.Range(1, retryCount))
+                {
+                    try
+                    {
+                        if (await PlatformHelper.OpenHotspots())
+                        {
+                            message.Add(ResStr.HotspotStarted);
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore
+                    }
+                }
+            }    
+
             result = result with { Message = message };
         }
         else

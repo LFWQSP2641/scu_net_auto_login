@@ -162,4 +162,16 @@
   <data name="ErrLoginFailedFormat" xml:space="preserve">
     <value>登录失败：{0}</value>
   </data>
+  <data name="SCUNETWifiConnected" xml:space="preserve">
+    <value>SCUNET Wifi 已连接</value>
+  </data>
+  <data name="HotspotStarted" xml:space="preserve">
+    <value>热点已开启</value>
+  </data>
+  <data name="HotspotStartFailed" xml:space="preserve">
+    <value>热点开启失败</value>
+  </data>
+  <data name="SCUNETWifiConnectFailed" xml:space="preserve">
+    <value>SCUNET Wifi 连接失败</value>
+  </data>
 </root>

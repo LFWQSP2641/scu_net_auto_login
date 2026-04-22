@@ -23,4 +23,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Resource\HotspotScript" />
+  </ItemGroup>
+
 </Project>

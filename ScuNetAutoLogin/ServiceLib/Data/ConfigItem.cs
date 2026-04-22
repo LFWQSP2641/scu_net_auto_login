@@ -6,4 +6,6 @@ public record ConfigItem
     public int RetryCount { get; init; }
     public int RetryDelayMs { get; init; }
     public List<AccountItem> UserList { get; init; } = [];
+    public bool EnableHotspot { get; init; }
+    public bool ConnectSCUNETWifi { get; init; }
 }

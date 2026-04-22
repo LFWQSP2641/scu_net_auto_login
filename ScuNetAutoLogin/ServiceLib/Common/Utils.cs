@@ -11,4 +11,9 @@ public class Utils
     {
         return GetBaseDirectory("config");
     }
+
+    public static bool IsWindows()
+    {
+        return OperatingSystem.IsWindows();
+    }
 }

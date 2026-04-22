@@ -162,4 +162,16 @@
   <data name="ErrLoginFailedFormat" xml:space="preserve">
     <value>Login failed: {0}</value>
   </data>
+  <data name="SCUNETWifiConnected" xml:space="preserve">
+    <value>SCUNET Wifi Connected</value>
+  </data>
+  <data name="HotspotStarted" xml:space="preserve">
+    <value>Hotspot Started</value>
+  </data>
+  <data name="HotspotStartFailed" xml:space="preserve">
+    <value>Hotspot Start Failed</value>
+  </data>
+  <data name="SCUNETWifiConnectFailed" xml:space="preserve">
+    <value>SCUNET Wifi Connect Failed</value>
+  </data>
 </root>

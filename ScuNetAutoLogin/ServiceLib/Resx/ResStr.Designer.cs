@@ -178,6 +178,24 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Hotspot Started 的本地化字符串。
+        /// </summary>
+        public static string HotspotStarted {
+            get {
+                return ResourceManager.GetString("HotspotStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Hotspot Start Failed 的本地化字符串。
+        /// </summary>
+        public static string HotspotStartFailed {
+            get {
+                return ResourceManager.GetString("HotspotStartFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Login failed for user {0}: {1} 的本地化字符串。
         /// </summary>
         public static string LoginFailedForUserFormat {
@@ -192,6 +210,24 @@ namespace ServiceLib.Resx {
         public static string NoUserConfigured {
             get {
                 return ResourceManager.GetString("NoUserConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 SCUNET Wifi Connected 的本地化字符串。
+        /// </summary>
+        public static string SCUNETWifiConnected {
+            get {
+                return ResourceManager.GetString("SCUNETWifiConnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 SCUNET Wifi Connect Failed 的本地化字符串。
+        /// </summary>
+        public static string SCUNETWifiConnectFailed {
+            get {
+                return ResourceManager.GetString("SCUNETWifiConnectFailed", resourceCulture);
             }
         }
     }
