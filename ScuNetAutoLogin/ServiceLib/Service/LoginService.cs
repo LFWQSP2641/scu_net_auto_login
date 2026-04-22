@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using ServiceLib.Common;
 using ServiceLib.Data;
 using ServiceLib.Helper;
+using ServiceLib.Resx;
 
 namespace ServiceLib.Service;
 
@@ -11,31 +12,31 @@ public abstract class LoginException : Exception
         : base(message, innerException) { }
 
     public sealed class UnsupportedService(string service)
-        : LoginException($"Unsupported service: {service}")
+        : LoginException(string.Format(ResStr.ErrUnsupportedServiceFormat, service))
     {
         public string Service { get; } = service;
     }
 
     public sealed class MissingMacAddress()
-        : LoginException("MAC address not found in query string");
+        : LoginException(ResStr.ErrMissingMacAddress);
 
     public sealed class AlreadyLoggedIn()
-        : LoginException("Already logged in");
+        : LoginException(ResStr.ErrAlreadyLoggedIn);
 
     public sealed class RiskControlTriggered()
-        : LoginException("Trigger risk control");
+        : LoginException(ResStr.ErrRiskControlTriggered);
 
     public sealed class TooManyUsersOnline()
-        : LoginException("Too many users online");
+        : LoginException(ResStr.ErrTooManyUsersOnline);
 
     public sealed class MissingRedirectLocation(string step)
-        : LoginException($"Redirect location is missing ({step})")
+        : LoginException(string.Format(ResStr.ErrMissingRedirectLocationFormat, step))
     {
         public string Step { get; } = step;
     }
 
     public sealed class UnexpectedRedirect(string location)
-        : LoginException($"Unexpected redirect location: {location}")
+        : LoginException(string.Format(ResStr.ErrUnexpectedRedirectFormat, location))
     {
         public string Location { get; } = location;
     }
@@ -44,7 +45,7 @@ public abstract class LoginException : Exception
         : LoginException(reason);
 
     public sealed class LoginFailed(string responseSnippet)
-        : LoginException($"Login failed: {responseSnippet}")
+        : LoginException(string.Format(ResStr.ErrLoginFailedFormat, responseSnippet))
     {
         public string ResponseSnippet { get; } = responseSnippet;
     }

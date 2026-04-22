@@ -1,4 +1,9 @@
-using ServiceLib.Resx;
+using ConsoleAppFramework;
+using Sal.CLI;
+using ServiceLib.Manager;
 
-Console.WriteLine(ResStr.Appname);
-Console.WriteLine(Thread.CurrentThread.CurrentCulture);
+AppManager.Instance.InitApp();
+
+var app = ConsoleApp.Create();
+app.Add<MyCommands>();
+app.Run(args);

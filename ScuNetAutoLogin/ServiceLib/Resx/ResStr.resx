@@ -123,4 +123,43 @@
   <data name="ErrModulusNotPositiveHex" xml:space="preserve">
 	  <value>Modulus must be a positive hexadecimal value.</value>
   </data>
+  <data name="AutoLoginSuccess" xml:space="preserve">
+    <value>Auto login successful.</value>
+  </data>
+  <data name="AutoLoginFailed" xml:space="preserve">
+    <value>Auto login failed.</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details:</value>
+  </data>
+  <data name="NoUserConfigured" xml:space="preserve">
+    <value>No user configured</value>
+  </data>
+  <data name="LoginFailedForUserFormat" xml:space="preserve">
+    <value>Login failed for user {0}: {1}</value>
+  </data>
+  <data name="ErrUnsupportedServiceFormat" xml:space="preserve">
+    <value>Unsupported service: {0}</value>
+  </data>
+  <data name="ErrMissingMacAddress" xml:space="preserve">
+    <value>MAC address not found in query string</value>
+  </data>
+  <data name="ErrAlreadyLoggedIn" xml:space="preserve">
+    <value>Already logged in</value>
+  </data>
+  <data name="ErrRiskControlTriggered" xml:space="preserve">
+    <value>Trigger risk control</value>
+  </data>
+  <data name="ErrTooManyUsersOnline" xml:space="preserve">
+    <value>Too many users online</value>
+  </data>
+  <data name="ErrMissingRedirectLocationFormat" xml:space="preserve">
+    <value>Redirect location is missing ({0})</value>
+  </data>
+  <data name="ErrUnexpectedRedirectFormat" xml:space="preserve">
+    <value>Unexpected redirect location: {0}</value>
+  </data>
+  <data name="ErrLoginFailedFormat" xml:space="preserve">
+    <value>Login failed: {0}</value>
+  </data>
 </root>

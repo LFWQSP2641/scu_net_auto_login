@@ -70,11 +70,128 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Auto login failed. 的本地化字符串。
+        /// </summary>
+        public static string AutoLoginFailed {
+            get {
+                return ResourceManager.GetString("AutoLoginFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Auto login successful. 的本地化字符串。
+        /// </summary>
+        public static string AutoLoginSuccess {
+            get {
+                return ResourceManager.GetString("AutoLoginSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Details: 的本地化字符串。
+        /// </summary>
+        public static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Already logged in 的本地化字符串。
+        /// </summary>
+        public static string ErrAlreadyLoggedIn {
+            get {
+                return ResourceManager.GetString("ErrAlreadyLoggedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Login failed: {0} 的本地化字符串。
+        /// </summary>
+        public static string ErrLoginFailedFormat {
+            get {
+                return ResourceManager.GetString("ErrLoginFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 MAC address not found in query string 的本地化字符串。
+        /// </summary>
+        public static string ErrMissingMacAddress {
+            get {
+                return ResourceManager.GetString("ErrMissingMacAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Redirect location is missing ({0}) 的本地化字符串。
+        /// </summary>
+        public static string ErrMissingRedirectLocationFormat {
+            get {
+                return ResourceManager.GetString("ErrMissingRedirectLocationFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Modulus must be a positive hexadecimal value. 的本地化字符串。
         /// </summary>
         public static string ErrModulusNotPositiveHex {
             get {
                 return ResourceManager.GetString("ErrModulusNotPositiveHex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Trigger risk control 的本地化字符串。
+        /// </summary>
+        public static string ErrRiskControlTriggered {
+            get {
+                return ResourceManager.GetString("ErrRiskControlTriggered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Too many users online 的本地化字符串。
+        /// </summary>
+        public static string ErrTooManyUsersOnline {
+            get {
+                return ResourceManager.GetString("ErrTooManyUsersOnline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Unexpected redirect location: {0} 的本地化字符串。
+        /// </summary>
+        public static string ErrUnexpectedRedirectFormat {
+            get {
+                return ResourceManager.GetString("ErrUnexpectedRedirectFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Unsupported service: {0} 的本地化字符串。
+        /// </summary>
+        public static string ErrUnsupportedServiceFormat {
+            get {
+                return ResourceManager.GetString("ErrUnsupportedServiceFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Login failed for user {0}: {1} 的本地化字符串。
+        /// </summary>
+        public static string LoginFailedForUserFormat {
+            get {
+                return ResourceManager.GetString("LoginFailedForUserFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No user configured 的本地化字符串。
+        /// </summary>
+        public static string NoUserConfigured {
+            get {
+                return ResourceManager.GetString("NoUserConfigured", resourceCulture);
             }
         }
     }

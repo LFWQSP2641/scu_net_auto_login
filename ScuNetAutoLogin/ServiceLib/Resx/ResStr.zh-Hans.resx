@@ -123,4 +123,43 @@
   <data name="ErrModulusNotPositiveHex" xml:space="preserve">
     <value>模数必须是正的十六进制值。</value>
   </data>
+  <data name="AutoLoginSuccess" xml:space="preserve">
+    <value>自动登录成功。</value>
+  </data>
+  <data name="AutoLoginFailed" xml:space="preserve">
+    <value>自动登录失败。</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>详情：</value>
+  </data>
+  <data name="NoUserConfigured" xml:space="preserve">
+    <value>没有用户配置</value>
+  </data>
+  <data name="LoginFailedForUserFormat" xml:space="preserve">
+    <value>{0} 用户登录失败：{1}</value>
+  </data>
+  <data name="ErrUnsupportedServiceFormat" xml:space="preserve">
+    <value>不支持的网络服务类型：{0}</value>
+  </data>
+  <data name="ErrMissingMacAddress" xml:space="preserve">
+    <value>在查询字符串中找不到 MAC 地址</value>
+  </data>
+  <data name="ErrAlreadyLoggedIn" xml:space="preserve">
+    <value>已经登录</value>
+  </data>
+  <data name="ErrRiskControlTriggered" xml:space="preserve">
+    <value>触发风控</value>
+  </data>
+  <data name="ErrTooManyUsersOnline" xml:space="preserve">
+    <value>账号在线用户过多</value>
+  </data>
+  <data name="ErrMissingRedirectLocationFormat" xml:space="preserve">
+    <value>重定向缺失（{0}）</value>
+  </data>
+  <data name="ErrUnexpectedRedirectFormat" xml:space="preserve">
+    <value>意外重定向位置：{0}</value>
+  </data>
+  <data name="ErrLoginFailedFormat" xml:space="preserve">
+    <value>登录失败：{0}</value>
+  </data>
 </root>

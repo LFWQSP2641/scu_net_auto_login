@@ -1,5 +1,6 @@
 using ServiceLib.Data;
 using ServiceLib.Manager;
+using ServiceLib.Resx;
 
 namespace ServiceLib.Service;
 
@@ -25,7 +26,7 @@ public class AutoLoginService
         var result = new AutoLoginServiceResult();
         if (config.UserList.Count == 0)
         {
-            result.Errors.Add("No user configured.");
+            result.Errors.Add(ResStr.NoUserConfigured);
             return result;
         }
         var message = new List<string>();
@@ -51,7 +52,7 @@ public class AutoLoginService
                 catch (Exception ex)
                 {
                     // log the error and continue with the next user
-                    message.Add($"Login failed for user {user.Username}: {ex.Message}");
+                    message.Add(string.Format(ResStr.LoginFailedForUserFormat, user.Username, ex.Message));
                     if (config.RetryDelayMs > 0)
                     {
                         await Task.Delay(config.RetryDelayMs);
@@ -64,12 +65,12 @@ public class AutoLoginService
         }
         if (loginSuccess)
         {
-            message.Add("Auto login successful.");
+            message.Add(ResStr.AutoLoginSuccess);
             result = result with { Message = message };
         }
         else
         {
-            message.Add("Auto login failed for all users.");
+            message.Add(ResStr.AutoLoginFailed);
             result = result with { Errors = message };
         }
         return result;
