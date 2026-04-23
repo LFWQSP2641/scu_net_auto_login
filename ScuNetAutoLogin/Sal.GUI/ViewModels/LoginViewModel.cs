@@ -2,7 +2,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Sal.GUI.Models;
 using Sal.GUI.Resx;
+using ServiceLib.Common;
 using ServiceLib.Data;
+using ServiceLib.Helper;
 using ServiceLib.Manager;
 using ServiceLib.Service;
 using System;
@@ -49,5 +51,23 @@ public partial class LoginViewModel : ViewModelBase
         {
             LoginMessage = ex.Message;
         }
+    }
+    
+    public static bool IsWindows() => Utils.IsWindows();
+
+    public static bool CanOpenHotspot() => IsWindows();
+
+    [RelayCommand(CanExecute = nameof(CanOpenHotspot))]
+    public async Task OpenHotspotAsync()
+    {
+        await PlatformHelper.OpenHotspots();
+    }
+
+    public static bool CanConnectWifi() => IsWindows();
+
+    [RelayCommand(CanExecute = nameof(CanConnectWifi))]
+    public async Task ConnectSCUNETWifiAsync()
+    {
+        await PlatformHelper.ConnectSCUNETWifi();
     }
 }

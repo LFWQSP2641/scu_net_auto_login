@@ -26,10 +26,10 @@
             <TextBlock Text="{x:Static res:ResUI.LbService}" />
             <ComboBox
                 MinWidth="200"
-                ItemsSource="{x:Static vm:ConfigEditViewModel.ServiceOptions}"
                 DisplayMemberBinding="{Binding Name}"
-                SelectedValueBinding="{Binding Id}"
-                SelectedValue="{Binding Account.Service, Mode=TwoWay}" />
+                ItemsSource="{x:Static vm:ConfigEditViewModel.ServiceOptions}"
+                SelectedValue="{Binding Account.Service, Mode=TwoWay}"
+                SelectedValueBinding="{Binding Id}" />
             <Separator Margin="0,8" />
             <TextBlock Text="{x:Static res:ResUI.LbInitialDelayMs}" />
             <TextBox Text="{Binding Config.InitialDelayMs, Mode=TwoWay}" />
@@ -37,8 +37,8 @@
             <TextBox Text="{Binding Config.RetryCount, Mode=TwoWay}" />
             <TextBlock Text="{x:Static res:ResUI.LbRetryDelayMs}" />
             <TextBox Text="{Binding Config.RetryDelayMs, Mode=TwoWay}" />
-            <CheckBox Content="{x:Static res:ResUI.CbEnableHotspot}" IsChecked="{Binding Config.EnableHotspot, Mode=TwoWay}" />
-            <CheckBox Content="{x:Static res:ResUI.CbConnectSCUNETWifi}" IsChecked="{Binding Config.ConnectSCUNETWifi, Mode=TwoWay}" />
+            <CheckBox Content="{x:Static res:ResUI.LbEnableHotspot}" IsChecked="{Binding Config.EnableHotspot, Mode=TwoWay}" />
+            <CheckBox Content="{x:Static res:ResUI.LbConnectWifi}" IsChecked="{Binding Config.ConnectSCUNETWifi, Mode=TwoWay}" />
         </StackPanel>
     </ScrollViewer>
 

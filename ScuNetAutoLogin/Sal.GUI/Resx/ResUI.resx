@@ -97,7 +97,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BtnLogin" xml:space="preserve">
+  <data name="LbLogin" xml:space="preserve">
     <value>Login</value>
   </data>
   <data name="LbRemark" xml:space="preserve">
@@ -121,10 +121,10 @@
   <data name="LbRetryDelayMs" xml:space="preserve">
     <value>Retry Delay (ms)</value>
   </data>
-  <data name="CbEnableHotspot" xml:space="preserve">
+  <data name="LbEnableHotspot" xml:space="preserve">
     <value>Enable Hotspot</value>
   </data>
-  <data name="CbConnectSCUNETWifi" xml:space="preserve">
+  <data name="LbConnectWifi" xml:space="preserve">
     <value>Connect SCUNET WiFi</value>
   </data>
   <data name="NavConfig" xml:space="preserve">

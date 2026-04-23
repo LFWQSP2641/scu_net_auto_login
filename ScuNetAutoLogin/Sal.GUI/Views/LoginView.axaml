@@ -21,7 +21,10 @@
             DockPanel.Dock="Bottom"
             Orientation="Horizontal"
             Spacing="8">
-            <Button Command="{Binding LoginCommand}" Content="{x:Static res:ResUI.BtnLogin}" />
+            <Button Command="{Binding LoginCommand}" Content="{x:Static res:ResUI.LbLogin}" />
+            <Separator />
+            <Button Command="{Binding OpenHotspotCommand}" Content="{x:Static res:ResUI.LbEnableHotspot}" />
+            <Button Command="{Binding ConnectSCUNETWifiCommand}" Content="{x:Static res:ResUI.LbConnectWifi}" />
         </StackPanel>
         <StackPanel Orientation="Vertical" Spacing="8">
             <Border

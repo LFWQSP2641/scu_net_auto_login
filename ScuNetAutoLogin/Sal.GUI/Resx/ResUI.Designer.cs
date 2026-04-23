@@ -61,29 +61,11 @@ namespace Sal.GUI.Resx {
         }
         
         /// <summary>
-        ///   查找类似 Login 的本地化字符串。
+        ///   查找类似  的本地化字符串。
         /// </summary>
-        public static string BtnLogin {
+        public static string _1 {
             get {
-                return ResourceManager.GetString("BtnLogin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Connect SCUNET WiFi 的本地化字符串。
-        /// </summary>
-        public static string CbConnectSCUNETWifi {
-            get {
-                return ResourceManager.GetString("CbConnectSCUNETWifi", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 Enable Hotspot 的本地化字符串。
-        /// </summary>
-        public static string CbEnableHotspot {
-            get {
-                return ResourceManager.GetString("CbEnableHotspot", resourceCulture);
+                return ResourceManager.GetString("1", resourceCulture);
             }
         }
         
@@ -115,11 +97,29 @@ namespace Sal.GUI.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Connect SCUNET WiFi 的本地化字符串。
+        /// </summary>
+        public static string LbConnectWifi {
+            get {
+                return ResourceManager.GetString("LbConnectWifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 edunet 的本地化字符串。
         /// </summary>
         public static string LbEdunet {
             get {
                 return ResourceManager.GetString("LbEdunet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enable Hotspot 的本地化字符串。
+        /// </summary>
+        public static string LbEnableHotspot {
+            get {
+                return ResourceManager.GetString("LbEnableHotspot", resourceCulture);
             }
         }
         
@@ -133,7 +133,16 @@ namespace Sal.GUI.Resx {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Login 的本地化字符串。
+        /// </summary>
+        public static string LbLogin {
+            get {
+                return ResourceManager.GetString("LbLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Message 的本地化字符串。
         /// </summary>
         public static string LbMessage {
             get {
