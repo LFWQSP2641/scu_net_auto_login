@@ -39,6 +39,10 @@
             <TextBox Text="{Binding Config.RetryDelayMs, Mode=TwoWay}" />
             <CheckBox Content="{x:Static res:ResUI.LbEnableHotspot}" IsChecked="{Binding Config.EnableHotspot, Mode=TwoWay}" />
             <CheckBox Content="{x:Static res:ResUI.LbConnectWifi}" IsChecked="{Binding Config.ConnectSCUNETWifi, Mode=TwoWay}" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Command="{Binding AddWindowsStartupCommand}" Content="{x:Static res:ResUI.LbAddStartup}" />
+                <Button Command="{Binding RemoveWindowsStartupCommand}" Content="{x:Static res:ResUI.LbRemoveStartup}" />
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 

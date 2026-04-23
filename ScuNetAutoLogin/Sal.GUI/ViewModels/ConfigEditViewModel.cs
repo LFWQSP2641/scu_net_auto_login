@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Sal.GUI.Models;
 using Sal.GUI.Resx;
 using ServiceLib.Common;
 using ServiceLib.Data;
+using ServiceLib.Helper;
 using ServiceLib.Manager;
 using System;
 using System.Collections.Generic;
@@ -49,6 +51,20 @@ public partial class ConfigEditViewModel : ViewModelBase
 
         _lastSavedSnapshot = CreateSnapshot(Config.ToConfigItem());
         _monitorTask = MonitorConfigChangesAsync(_monitorCts.Token);
+    }
+
+    public static bool CanManageStartup() => Utils.IsWindows();
+
+    [RelayCommand(CanExecute = nameof(CanManageStartup))]
+    public void AddWindowsStartup()
+    {
+        StartupHelper.AddStartup();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanManageStartup))]
+    public void RemoveWindowsStartup()
+    {
+        StartupHelper.RemoveStartup();
     }
 
     public async Task OnViewClosingAsync()

@@ -157,4 +157,10 @@
   <data name="LbMessage" xml:space="preserve">
     <value>信息</value>
   </data>
+  <data name="LbAddStartup" xml:space="preserve">
+    <value>添加开机自启</value>
+  </data>
+  <data name="LbRemoveStartup" xml:space="preserve">
+    <value>删除开机自启</value>
+  </data>
 </root>

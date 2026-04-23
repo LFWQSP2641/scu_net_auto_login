@@ -61,11 +61,11 @@ namespace Sal.GUI.Resx {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 Add Startup 的本地化字符串。
         /// </summary>
-        public static string _1 {
+        public static string LbAddStartup {
             get {
-                return ResourceManager.GetString("1", resourceCulture);
+                return ResourceManager.GetString("LbAddStartup", resourceCulture);
             }
         }
         
@@ -165,6 +165,15 @@ namespace Sal.GUI.Resx {
         public static string LbRemark {
             get {
                 return ResourceManager.GetString("LbRemark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remove Startup 的本地化字符串。
+        /// </summary>
+        public static string LbRemoveStartup {
+            get {
+                return ResourceManager.GetString("LbRemoveStartup", resourceCulture);
             }
         }
         
