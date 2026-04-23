@@ -1,0 +1,66 @@
+<Window
+    x:Class="Sal.GUI.Views.MainWindowView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sal.GUI.ViewModels"
+    Title="Sal.GUI"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainWindowViewModel"
+    Icon="/Assets/avalonia-logo.ico"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <SplitView
+        x:Name="MainSplitView"
+        CompactPaneLength="48"
+        DisplayMode="CompactInline"
+        IsPaneOpen="{Binding IsPaneOpen, Mode=TwoWay}"
+        OpenPaneLength="260"
+        PaneBackground="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+
+        <SplitView.Pane>
+            <StackPanel Margin="4" Spacing="8">
+                <Button
+                    Width="40"
+                    Margin="0,4,0,4"
+                    HorizontalAlignment="Left"
+                    Command="{Binding TogglePaneCommand}">
+                    <Button.Content>
+                        <PathIcon Width="20" Data="{StaticResource SemiIconMenu}" />
+                    </Button.Content>
+                </Button>
+
+                <ListBox
+                    Background="Transparent"
+                    ItemsSource="{Binding NavItems}"
+                    SelectedItem="{Binding SelectedNavItem}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="8,6">
+                                <PathIcon
+                                    Width="20"
+                                    Height="20"
+                                    Data="{Binding IconGeometry}"
+                                    DockPanel.Dock="Left" />
+                                <TextBlock
+                                    Margin="12,0,0,0"
+                                    IsVisible="{Binding IsPaneOpen, RelativeSource={RelativeSource AncestorType=SplitView}}"
+                                    Text="{Binding Title}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </SplitView.Pane>
+
+        <SplitView.Content>
+            <ContentControl Margin="16" Content="{Binding CurrentPage}" />
+        </SplitView.Content>
+    </SplitView>
+</Window>

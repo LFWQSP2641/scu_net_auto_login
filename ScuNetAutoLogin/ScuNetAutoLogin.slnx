@@ -3,6 +3,7 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="Sal.CLI/Sal.CLI.csproj" Id="b702c953-d88e-4f19-b8a6-badc150bc25e" />
+  <Project Path="Sal.GUI/Sal.GUI.csproj" Id="74477cd0-254c-4612-a5c2-916857c42aa3" />
   <Project Path="ServiceLib.Test/ServiceLib.Test.csproj" Id="cde65538-e274-4ecc-880c-028101edfb1c" />
   <Project Path="ServiceLib/ServiceLib.csproj" Id="d0af492a-2106-4170-bf89-e6c45d1bce9c" />
 </Solution>

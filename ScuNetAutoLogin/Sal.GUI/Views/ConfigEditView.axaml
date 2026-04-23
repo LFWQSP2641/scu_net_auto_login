@@ -1,0 +1,43 @@
+<UserControl
+    x:Class="Sal.GUI.Views.ConfigEditView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="clr-namespace:ServiceLib.Common;assembly=ServiceLib"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Sal.GUI.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:ConfigEditViewModel"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:ConfigEditViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer>
+        <StackPanel Margin="16" Spacing="12">
+            <TextBlock Text="Remark" />
+            <TextBox Text="{Binding Account.Remark, Mode=TwoWay}" />
+            <TextBlock Text="Username" />
+            <TextBox Text="{Binding Account.Username, Mode=TwoWay}" />
+            <TextBlock Text="Password" />
+            <TextBox Text="{Binding Account.Password, Mode=TwoWay}" />
+            <TextBlock Text="Service" />
+            <ComboBox
+                MinWidth="200"
+                ItemsSource="{x:Static common:LoginConstants.ServiceCodeList}"
+                SelectedItem="{Binding Account.Service, Mode=TwoWay}" />
+            <Separator Margin="0,8" />
+            <TextBlock Text="Initial Delay (ms)" />
+            <TextBox Text="{Binding Config.InitialDelayMs, Mode=TwoWay}" />
+            <TextBlock Text="Retry Count" />
+            <TextBox Text="{Binding Config.RetryCount, Mode=TwoWay}" />
+            <TextBlock Text="Retry Delay (ms)" />
+            <TextBox Text="{Binding Config.RetryDelayMs, Mode=TwoWay}" />
+            <CheckBox Content="Enable Hotspot" IsChecked="{Binding Config.EnableHotspot, Mode=TwoWay}" />
+            <CheckBox Content="Connect SCUNET WiFi" IsChecked="{Binding Config.ConnectSCUNETWifi, Mode=TwoWay}" />
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

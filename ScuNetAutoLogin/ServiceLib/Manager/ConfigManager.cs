@@ -18,7 +18,7 @@ public class ConfigManager
         {
             var filePath = Path.Combine(Utils.GetConfigPath(), "config.json");
             var fileContent = File.ReadAllText(filePath);
-            config = JsonSerializer.Deserialize(fileContent, AppJsonContext.Default.ConfigItem);
+            config = JsonUtils.Deserialize<ConfigItem>(fileContent);
         }
         catch
         {
@@ -40,7 +40,7 @@ public class ConfigManager
                 Directory.CreateDirectory(directoryPath!);
             }
             var tempFilePath = filePath + ".tmp";
-            var jsonContent = JsonSerializer.Serialize(config, AppJsonContext.Default.ConfigItem);
+            var jsonContent = JsonUtils.Serialize(config);
             await File.WriteAllTextAsync(tempFilePath, jsonContent);
             File.Move(tempFilePath, filePath, true);
         }
