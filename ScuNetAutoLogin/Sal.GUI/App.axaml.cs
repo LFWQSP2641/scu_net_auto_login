@@ -1,11 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Sal.GUI.ViewModels;
 using Sal.GUI.Views;
-using System.Linq;
 
 namespace Sal.GUI;
 

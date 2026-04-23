@@ -1,12 +1,13 @@
-using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Sal.GUI.Models;
-using ServiceLib.Manager;
-using System.Linq;
-using ServiceLib.Data;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using Sal.GUI.Models;
+using Sal.GUI.Resx;
+using ServiceLib.Data;
+using ServiceLib.Manager;
 using ServiceLib.Service;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sal.GUI.ViewModels;
 
@@ -42,7 +43,7 @@ public partial class LoginViewModel : ViewModelBase
         try
         {
             await loginService.StartLogin(accountItem);
-            LoginMessage = "Login successful!";
+            LoginMessage = ResUI.MsgLoginSuccess;
         }
         catch (Exception ex)
         {

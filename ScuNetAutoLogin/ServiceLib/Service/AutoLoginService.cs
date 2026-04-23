@@ -104,7 +104,7 @@ public class AutoLoginService
                         // Ignore
                     }
                 }
-            }    
+            }
 
             result = result with { Message = message };
         }

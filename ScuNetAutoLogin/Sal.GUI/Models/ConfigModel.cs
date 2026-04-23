@@ -1,13 +1,14 @@
-using System.Collections.ObjectModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ServiceLib.Data;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Sal.GUI.Models;
 
 public partial class ConfigModel : ObservableObject
 {
-    public ConfigModel() { }
+    public ConfigModel()
+    { }
 
     public ConfigModel(ConfigItem configItem)
     {
@@ -60,5 +61,4 @@ public partial class ConfigModel : ObservableObject
             ConnectSCUNETWifi = ConnectSCUNETWifi
         };
     }
-
 }

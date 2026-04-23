@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Sal.GUI.Resx;
 using Sal.GUI.ViewModels;
 using Sal.GUI.Views;
 using System;
@@ -25,7 +26,7 @@ public class ViewLocator : IDataTemplate
     public Control Build(object? data)
     {
         if (data is null)
-            return new TextBlock { Text = $"No VM provided" };
+            return new TextBlock { Text = ResUI.MsgNoVmProvided };
 
         _locator.TryGetValue(data.GetType(), out var factory);
 
@@ -35,7 +36,7 @@ public class ViewLocator : IDataTemplate
             throw new InvalidOperationException($"No view registered for VM type: {data.GetType()}");
         }
 #endif
-        return factory?.Invoke() ?? new TextBlock { Text = $"VM Not Registered: {data.GetType()}" };
+        return factory?.Invoke() ?? new TextBlock { Text = string.Format(ResUI.MsgViewModelNotRegistered, data.GetType()) };
     }
 
     public bool Match(object? data)
@@ -50,4 +51,3 @@ public class ViewLocator : IDataTemplate
         where TView : Control, new()
         => _locator.Add(typeof(TViewModel), () => new TView());
 }
-

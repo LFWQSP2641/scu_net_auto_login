@@ -10,8 +10,10 @@ public partial class LoginConstants
 
     public const string HttpHeaderUserAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0";
+
     public const string HttpHeaderContentType =
         "application/x-www-form-urlencoded; charset=UTF-8";
+
     public const string HttpHeaderAccept = "*/*";
 
     public static readonly List<string> ServiceCodeList =
@@ -29,7 +31,6 @@ public partial class LoginConstants
         {"chinaunicom", "%E8%81%94%E9%80%9A%E5%87%BA%E5%8F%A3"},
         {"edunet", "internet"},
     };
-
 
     public static readonly List<Regex> QueryStringExtractPatterns =
     [

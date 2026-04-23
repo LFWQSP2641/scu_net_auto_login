@@ -1,8 +1,9 @@
+using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Sal.GUI.Resx;
 using System.Collections.ObjectModel;
-using Avalonia;
 
 namespace Sal.GUI.ViewModels;
 
@@ -23,13 +24,15 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         NavItems.Add(new NavItem
         {
-            Title = "Config",
+            Id = "config",
+            Title = ResUI.NavConfig,
             IconGeometry = ResolveIconGeometry("SemiIconSettingStroked")
         });
 
         NavItems.Add(new NavItem
         {
-            Title = "Login",
+            Id = "login",
+            Title = ResUI.NavLogin,
             IconGeometry = ResolveIconGeometry("SemiIconUserStroked")
         });
 
@@ -62,10 +65,10 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             return;
         }
-        CurrentPage = value.Title switch
+        CurrentPage = value.Id switch
         {
-            "Config" => new ConfigEditViewModel(),
-            "Login" => new LoginViewModel(),
+            "config" => new ConfigEditViewModel(),
+            "login" => new LoginViewModel(),
             _ => null
         };
     }
@@ -73,6 +76,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
 public class NavItem
 {
+    public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public Geometry? IconGeometry { get; set; }
 }

@@ -59,5 +59,185 @@ namespace Sal.GUI.Resx {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查找类似 Login 的本地化字符串。
+        /// </summary>
+        public static string BtnLogin {
+            get {
+                return ResourceManager.GetString("BtnLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Connect SCUNET WiFi 的本地化字符串。
+        /// </summary>
+        public static string CbConnectSCUNETWifi {
+            get {
+                return ResourceManager.GetString("CbConnectSCUNETWifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enable Hotspot 的本地化字符串。
+        /// </summary>
+        public static string CbEnableHotspot {
+            get {
+                return ResourceManager.GetString("CbEnableHotspot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 China Mobile 的本地化字符串。
+        /// </summary>
+        public static string LbChinaMobile {
+            get {
+                return ResourceManager.GetString("LbChinaMobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 China Telecom 的本地化字符串。
+        /// </summary>
+        public static string LbChinaTelecom {
+            get {
+                return ResourceManager.GetString("LbChinaTelecom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 China Unicom 的本地化字符串。
+        /// </summary>
+        public static string LbChinaUnicom {
+            get {
+                return ResourceManager.GetString("LbChinaUnicom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 edunet 的本地化字符串。
+        /// </summary>
+        public static string LbEdunet {
+            get {
+                return ResourceManager.GetString("LbEdunet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Initial Delay (ms) 的本地化字符串。
+        /// </summary>
+        public static string LbInitialDelayMs {
+            get {
+                return ResourceManager.GetString("LbInitialDelayMs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似  的本地化字符串。
+        /// </summary>
+        public static string LbMessage {
+            get {
+                return ResourceManager.GetString("LbMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Password 的本地化字符串。
+        /// </summary>
+        public static string LbPassword {
+            get {
+                return ResourceManager.GetString("LbPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Remark 的本地化字符串。
+        /// </summary>
+        public static string LbRemark {
+            get {
+                return ResourceManager.GetString("LbRemark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Retry Count 的本地化字符串。
+        /// </summary>
+        public static string LbRetryCount {
+            get {
+                return ResourceManager.GetString("LbRetryCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Retry Delay (ms) 的本地化字符串。
+        /// </summary>
+        public static string LbRetryDelayMs {
+            get {
+                return ResourceManager.GetString("LbRetryDelayMs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Service 的本地化字符串。
+        /// </summary>
+        public static string LbService {
+            get {
+                return ResourceManager.GetString("LbService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Username 的本地化字符串。
+        /// </summary>
+        public static string LbUsername {
+            get {
+                return ResourceManager.GetString("LbUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Login successful! 的本地化字符串。
+        /// </summary>
+        public static string MsgLoginSuccess {
+            get {
+                return ResourceManager.GetString("MsgLoginSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No VM provided 的本地化字符串。
+        /// </summary>
+        public static string MsgNoVmProvided {
+            get {
+                return ResourceManager.GetString("MsgNoVmProvided", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 VM Not Registered: {0} 的本地化字符串。
+        /// </summary>
+        public static string MsgViewModelNotRegistered {
+            get {
+                return ResourceManager.GetString("MsgViewModelNotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Config 的本地化字符串。
+        /// </summary>
+        public static string NavConfig {
+            get {
+                return ResourceManager.GetString("NavConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Login 的本地化字符串。
+        /// </summary>
+        public static string NavLogin {
+            get {
+                return ResourceManager.GetString("NavLogin", resourceCulture);
+            }
+        }
     }
 }

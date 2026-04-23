@@ -8,7 +8,9 @@ public class AppManager
     public static AppManager Instance => _instance.Value;
 
     private ConfigItem _config = new();
+
     public ConfigItem GetConfig() => _config;
+
     public async Task SetConfig(ConfigItem config)
     {
         _config = config;

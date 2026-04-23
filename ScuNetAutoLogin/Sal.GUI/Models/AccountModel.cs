@@ -5,7 +5,8 @@ namespace Sal.GUI.Models;
 
 public partial class AccountModel : ObservableObject
 {
-    public AccountModel() { }
+    public AccountModel()
+    { }
 
     public AccountModel(AccountItem accountItem)
     {
