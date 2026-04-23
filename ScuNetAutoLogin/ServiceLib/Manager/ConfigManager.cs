@@ -33,7 +33,12 @@ public class ConfigManager
         await _fileLock.WaitAsync();
         try
         {
-            var filePath = Path.Combine(Utils.GetConfigPath(), "config.json");
+            var filePath = Path.Combine(Utils.GetConfigPath(), Global.ConfigFileName);
+            var directoryPath = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath!);
+            }
             var tempFilePath = filePath + ".tmp";
             var jsonContent = JsonSerializer.Serialize(config, AppJsonContext.Default.ConfigItem);
             await File.WriteAllTextAsync(tempFilePath, jsonContent);
