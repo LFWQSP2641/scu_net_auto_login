@@ -14,19 +14,11 @@ using System.Threading.Tasks;
 
 namespace Sal.GUI.ViewModels;
 
-public sealed record ServiceOption(string Id, string Name);
-
 public partial class ConfigEditViewModel : ViewModelBase
 {
     private static readonly TimeSpan SaveCheckInterval = TimeSpan.FromMilliseconds(800);
 
-    public static IReadOnlyList<ServiceOption> ServiceOptions { get; } =
-    [
-        new("edunet", ResUI.LbEdunet),
-        new("chinatelecom", ResUI.LbChinaTelecom),
-        new("chinamobile", ResUI.LbChinaMobile),
-        new("chinaunicom", ResUI.LbChinaUnicom),
-    ];
+    public static IReadOnlyList<ServiceOption> ServiceOptions { get; } = ServiceOption.CreateDefaultList();
 
     private readonly SemaphoreSlim _saveGate = new(1, 1);
     private readonly CancellationTokenSource _monitorCts = new();

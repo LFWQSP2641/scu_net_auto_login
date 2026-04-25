@@ -33,20 +33,18 @@
                 Background="{DynamicResource SystemRegionBrushLow}"
                 BoxShadow="0 4 10 0 #40000000"
                 CornerRadius="8">
-                <StackPanel>
-                    <TextBlock>
-                        <Run FontWeight="Bold" Text="{x:Static res:ResUI.LbRemark}" />
-                        <Run Text=": " />
-                        <Run Text="{Binding Account.Remark, Mode=OneWay}" />
-                        <LineBreak />
-                        <Run FontWeight="Bold" Text="{x:Static res:ResUI.LbUsername}" />
-                        <Run Text=": " />
-                        <Run Text="{Binding Account.Username, Mode=OneWay}" />
-                        <LineBreak />
-                        <Run FontWeight="Bold" Text="{x:Static res:ResUI.LbService}" />
-                        <Run Text=": " />
-                        <Run Text="{Binding Account.Service, Mode=OneWay}" />
-                    </TextBlock>
+                <StackPanel Spacing="12">
+                    <TextBlock Text="{x:Static res:ResUI.LbUsername}" />
+                    <TextBox Text="{Binding Account.Username, Mode=TwoWay}" />
+                    <TextBlock Text="{x:Static res:ResUI.LbPassword}" />
+                    <TextBox Text="{Binding Account.Password, Mode=TwoWay}" />
+                    <TextBlock Text="{x:Static res:ResUI.LbService}" />
+                    <ComboBox
+                        MinWidth="200"
+                        DisplayMemberBinding="{Binding Name}"
+                        ItemsSource="{x:Static vm:LoginViewModel.ServiceOptions}"
+                        SelectedValue="{Binding Account.Service, Mode=TwoWay}"
+                        SelectedValueBinding="{Binding Id}" />
                 </StackPanel>
             </Border>
             <Border

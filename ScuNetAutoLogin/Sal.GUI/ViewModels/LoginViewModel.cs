@@ -8,6 +8,7 @@ using ServiceLib.Helper;
 using ServiceLib.Manager;
 using ServiceLib.Service;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,6 +23,8 @@ public partial class LoginViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasLoginMessage))]
     public partial string LoginMessage { get; set; } = string.Empty;
+
+    public static IReadOnlyList<ServiceOption> ServiceOptions { get; } = ServiceOption.CreateDefaultList();
 
     public bool HasLoginMessage => !string.IsNullOrEmpty(LoginMessage);
 
