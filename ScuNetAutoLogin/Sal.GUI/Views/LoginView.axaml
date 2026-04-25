@@ -37,7 +37,10 @@
                     <TextBlock Text="{x:Static res:ResUI.LbUsername}" />
                     <TextBox Text="{Binding Account.Username, Mode=TwoWay}" />
                     <TextBlock Text="{x:Static res:ResUI.LbPassword}" />
-                    <TextBox Text="{Binding Account.Password, Mode=TwoWay}" />
+                    <TextBox
+                        Classes="RevealPasswordButton"
+                        PasswordChar="*"
+                        Text="{Binding Account.Password, Mode=TwoWay}" />
                     <TextBlock Text="{x:Static res:ResUI.LbService}" />
                     <ComboBox
                         MinWidth="200"
