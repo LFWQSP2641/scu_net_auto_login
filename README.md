@@ -28,7 +28,7 @@
 
 ---
 
-### C# 版本
+### C# 版本 (CLI)
 
 1. 从 [Release页面](https://github.com/LFWQSP2641/scu_net_auto_login/releases) 下载合适的版本（Windows/Linux/MacOS）。
 
@@ -96,6 +96,18 @@
 
 ```bash
 ./Sal.CLI.exe login -h
+```
+
+### C# 版本 (GUI)
+
+可界面化配置账号信息和登录选项；同时支持手动连接校园网 WiFi ，开启热点以及手动登录等功能。
+
+可以通过命令行参数 `cli` 启动 GUI 版本的 CLI 模式：
+
+```bash
+./Sal.GUI.exe cli
+# 使用命令行方式登录
+./Sal.GUI.exe cli login -u 123 -p 123 -s EDUNET --initial-delay 5 --enable-hotspot --connectscunet-wifi
 ```
 
 ## 技术栈
