@@ -9,6 +9,7 @@ using ServiceLib.Manager;
 using ServiceLib.Service;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,10 +35,35 @@ public partial class LoginViewModel : ViewModelBase
         Account = new(configItem.UserList.FirstOrDefault(new AccountItem()));
     }
 
+    partial void OnAccountChanging(AccountModel oldValue, AccountModel newValue)
+    {
+        if (oldValue is not null)
+        {
+            oldValue.PropertyChanged -= OnAccountPropertyChanged;
+        }
+    }
+
+    partial void OnAccountChanged(AccountModel value)
+    {
+        value.PropertyChanged += OnAccountPropertyChanged;
+        LoginCommand.NotifyCanExecuteChanged();
+    }
+
     public bool CanLogin() =>
         !string.IsNullOrEmpty(Account.Username)
         && !string.IsNullOrEmpty(Account.Password)
         && !string.IsNullOrEmpty(Account.Service);
+
+    private void OnAccountPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.PropertyName)
+            || e.PropertyName == nameof(AccountModel.Username)
+            || e.PropertyName == nameof(AccountModel.Password)
+            || e.PropertyName == nameof(AccountModel.Service))
+        {
+            LoginCommand.NotifyCanExecuteChanged();
+        }
+    }
 
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync()
