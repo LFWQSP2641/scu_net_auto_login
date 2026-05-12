@@ -9,7 +9,6 @@ using ServiceLib.Manager;
 using ServiceLib.Service;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +18,15 @@ public partial class LoginViewModel : ViewModelBase
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    public partial AccountModel Account { get; set; }
+    public partial string Username { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    public partial string Password { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    public partial string Service { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasLoginMessage))]
@@ -32,52 +39,27 @@ public partial class LoginViewModel : ViewModelBase
     public LoginViewModel()
     {
         var configItem = AppManager.Instance.GetConfig();
-        Account = new(configItem.UserList.FirstOrDefault(new AccountItem()));
-    }
-
-    partial void OnAccountChanging(AccountModel oldValue, AccountModel newValue)
-    {
-        if (oldValue is not null)
-        {
-            oldValue.PropertyChanged -= OnAccountPropertyChanged;
-        }
-    }
-
-    partial void OnAccountChanged(AccountModel value)
-    {
-        if (value is null)
-        {
-            return;
-        }
-
-        value.PropertyChanged += OnAccountPropertyChanged;
-        LoginCommand.NotifyCanExecuteChanged();
+        var account = configItem.UserList.FirstOrDefault(new AccountItem());
+        Username = account.Username;
+        Password = account.Password;
+        Service = account.Service;
     }
 
     public bool CanLogin() =>
-        Account is not null
-        && !string.IsNullOrEmpty(Account.Username)
-        && !string.IsNullOrEmpty(Account.Password)
-        && !string.IsNullOrEmpty(Account.Service);
-
-    private void OnAccountPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is { Length: > 0 } propertyName
-            && propertyName != nameof(AccountModel.Username)
-            && propertyName != nameof(AccountModel.Password)
-            && propertyName != nameof(AccountModel.Service))
-        {
-            return;
-        }
-
-        LoginCommand.NotifyCanExecuteChanged();
-    }
+        !string.IsNullOrEmpty(Username)
+        && !string.IsNullOrEmpty(Password)
+        && !string.IsNullOrEmpty(Service);
 
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync()
     {
         LoginMessage = string.Empty;
-        var accountItem = Account.ToAccountItem();
+        var accountItem = new AccountItem
+        {
+            Username = Username,
+            Password = Password,
+            Service = Service
+        };
         var loginService = new LoginService();
         try
         {
