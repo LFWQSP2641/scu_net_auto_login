@@ -45,13 +45,11 @@ public partial class LoginViewModel : ViewModelBase
 
     partial void OnAccountChanged(AccountModel value)
     {
-        if (value is null)
+        if (value is not null)
         {
-            LoginCommand.NotifyCanExecuteChanged();
-            return;
+            value.PropertyChanged += OnAccountPropertyChanged;
         }
 
-        value.PropertyChanged += OnAccountPropertyChanged;
         LoginCommand.NotifyCanExecuteChanged();
     }
 
