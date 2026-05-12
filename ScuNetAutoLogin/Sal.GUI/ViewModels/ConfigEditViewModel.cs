@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Sal.GUI.Models;
-using Sal.GUI.Resx;
 using ServiceLib.Common;
 using ServiceLib.Data;
 using ServiceLib.Helper;

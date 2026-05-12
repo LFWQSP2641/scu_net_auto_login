@@ -18,7 +18,15 @@ public partial class LoginViewModel : ViewModelBase
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    public partial AccountModel Account { get; set; }
+    public partial string Username { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    public partial string Password { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+    public partial string Service { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasLoginMessage))]
@@ -31,19 +39,27 @@ public partial class LoginViewModel : ViewModelBase
     public LoginViewModel()
     {
         var configItem = AppManager.Instance.GetConfig();
-        Account = new(configItem.UserList.FirstOrDefault(new AccountItem()));
+        var account = configItem.UserList.FirstOrDefault(new AccountItem());
+        Username = account.Username;
+        Password = account.Password;
+        Service = account.Service;
     }
 
     public bool CanLogin() =>
-        !string.IsNullOrEmpty(Account.Username)
-        && !string.IsNullOrEmpty(Account.Password)
-        && !string.IsNullOrEmpty(Account.Service);
+        !string.IsNullOrEmpty(Username)
+        && !string.IsNullOrEmpty(Password)
+        && !string.IsNullOrEmpty(Service);
 
     [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task LoginAsync()
     {
         LoginMessage = string.Empty;
-        var accountItem = Account.ToAccountItem();
+        var accountItem = new AccountItem
+        {
+            Username = Username,
+            Password = Password,
+            Service = Service
+        };
         var loginService = new LoginService();
         try
         {
