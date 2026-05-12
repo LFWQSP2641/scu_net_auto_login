@@ -45,11 +45,12 @@ public partial class LoginViewModel : ViewModelBase
 
     partial void OnAccountChanged(AccountModel value)
     {
-        if (value is not null)
+        if (value is null)
         {
-            value.PropertyChanged += OnAccountPropertyChanged;
+            return;
         }
 
+        value.PropertyChanged += OnAccountPropertyChanged;
         LoginCommand.NotifyCanExecuteChanged();
     }
 
@@ -61,13 +62,15 @@ public partial class LoginViewModel : ViewModelBase
 
     private void OnAccountPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (string.IsNullOrEmpty(e.PropertyName)
-            || e.PropertyName == nameof(AccountModel.Username)
-            || e.PropertyName == nameof(AccountModel.Password)
-            || e.PropertyName == nameof(AccountModel.Service))
+        if (e.PropertyName is { Length: > 0 } propertyName
+            && propertyName != nameof(AccountModel.Username)
+            && propertyName != nameof(AccountModel.Password)
+            && propertyName != nameof(AccountModel.Service))
         {
-            LoginCommand.NotifyCanExecuteChanged();
+            return;
         }
+
+        LoginCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanLogin))]
