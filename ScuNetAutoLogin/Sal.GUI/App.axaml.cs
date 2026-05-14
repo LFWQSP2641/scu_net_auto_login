@@ -6,7 +6,7 @@ using Sal.GUI.Views;
 
 namespace Sal.GUI;
 
-public partial class App : Application
+public class App : Application
 {
     public override void Initialize()
     {

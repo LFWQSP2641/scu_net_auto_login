@@ -11,30 +11,44 @@ public class JsonUtils
     private static readonly JsonSerializerOptions _defaultDeserializeOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip
+        ReadCommentHandling = JsonCommentHandling.Skip,
     };
 
     private static readonly JsonSerializerOptions _defaultSerializeOptions = new()
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
+    private static readonly JsonSerializerOptions _defaultSerializeNoIndentedOptions = new()
+    {
+        WriteIndented = false,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     private static readonly JsonSerializerOptions _nullValueSerializeOptions = new()
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
+    private static readonly JsonSerializerOptions _nullValueSerializeNoIndentedOptions = new()
+    {
+        WriteIndented = false,
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     private static readonly JsonDocumentOptions _defaultDocumentOptions = new()
     {
-        CommentHandling = JsonCommentHandling.Skip
+        CommentHandling = JsonCommentHandling.Skip,
     };
 
     /// <summary>
-    /// DeepCopy
+    ///     DeepCopy
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="obj"></param>
@@ -46,25 +60,23 @@ public class JsonUtils
             return default;
         }
 
-        var typeInfo = AppJsonContext.Default.GetTypeInfo(typeof(T)) as JsonTypeInfo<T>;
-        if (typeInfo is null)
+        if (AppJsonContext.Default.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
         {
             return default;
         }
 
-        return Deserialize(Serialize(obj, typeInfo, indented: false), typeInfo);
+        return Deserialize(Serialize(obj, typeInfo, false), typeInfo);
     }
 
     /// <summary>
-    /// Deserialize to object
+    ///     Deserialize to object
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="strJson"></param>
     /// <returns></returns>
     public static T? Deserialize<T>(string? strJson)
     {
-        var typeInfo = AppJsonContext.Default.GetTypeInfo(typeof(T)) as JsonTypeInfo<T>;
-        if (typeInfo is null)
+        if (AppJsonContext.Default.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
         {
             return default;
         }
@@ -90,7 +102,7 @@ public class JsonUtils
     }
 
     /// <summary>
-    /// parse
+    ///     parse
     /// </summary>
     /// <param name="strJson"></param>
     /// <returns></returns>
@@ -102,17 +114,17 @@ public class JsonUtils
             {
                 return null;
             }
-            return JsonNode.Parse(strJson, nodeOptions: null, _defaultDocumentOptions);
+            return JsonNode.Parse(strJson, null, _defaultDocumentOptions);
         }
         catch
         {
-            //SaveLog(ex.Message, ex);
+            // SaveLog(ex.Message, ex);
             return null;
         }
     }
 
     /// <summary>
-    /// Serialize Object to Json string
+    ///     Serialize Object to Json string
     /// </summary>
     /// <param name="obj"></param>
     /// <param name="indented"></param>
@@ -150,7 +162,7 @@ public class JsonUtils
     }
 
     /// <summary>
-    /// Serialize Object to Json string
+    ///     Serialize Object to Json string
     /// </summary>
     /// <param name="obj"></param>
     /// <param name="options"></param>
@@ -196,7 +208,7 @@ public class JsonUtils
             var options = BuildSerializeOptions(indented, nullValue);
             var json = JsonSerializer.Serialize(obj, typeInfo);
 
-            if (options.WriteIndented && options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull)
+            if (options is { WriteIndented: true, DefaultIgnoreCondition: JsonIgnoreCondition.WhenWritingNull })
             {
                 return json;
             }
@@ -211,7 +223,7 @@ public class JsonUtils
     }
 
     /// <summary>
-    /// SerializeToNode
+    ///     SerializeToNode
     /// </summary>
     /// <param name="obj"></param>
     /// <param name="options"></param>
@@ -232,7 +244,7 @@ public class JsonUtils
         try
         {
             var json = JsonSerializer.Serialize(obj, typeInfo);
-            return JsonNode.Parse(json, nodeOptions: null, _defaultDocumentOptions);
+            return JsonNode.Parse(json, null, _defaultDocumentOptions);
         }
         catch
         {
@@ -242,10 +254,13 @@ public class JsonUtils
 
     private static JsonSerializerOptions BuildSerializeOptions(bool indented, bool nullValue)
     {
-        return new JsonSerializerOptions(_defaultSerializeOptions)
+        var options = (nullValue, indented) switch
         {
-            WriteIndented = indented,
-            DefaultIgnoreCondition = nullValue ? JsonIgnoreCondition.Never : JsonIgnoreCondition.WhenWritingNull
+            (true, true) => _nullValueSerializeOptions,
+            (true, false) => _nullValueSerializeNoIndentedOptions,
+            (false, true) => _defaultSerializeOptions,
+            _ => _defaultSerializeNoIndentedOptions,
         };
+        return options;
     }
 }

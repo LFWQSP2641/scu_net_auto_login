@@ -1,16 +1,16 @@
+using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Sal.GUI.Resx;
 using Sal.GUI.ViewModels;
 using Sal.GUI.Views;
-using System;
-using System.Collections.Generic;
 
 namespace Sal.GUI;
 
 /// <summary>
-/// Given a view model, returns the corresponding view if possible.
+///     Given a view model, returns the corresponding view if possible.
 /// </summary>
 public class ViewLocator : IDataTemplate
 {
@@ -26,7 +26,9 @@ public class ViewLocator : IDataTemplate
     public Control Build(object? data)
     {
         if (data is null)
+        {
             return new TextBlock { Text = ResUI.MsgNoVmProvided };
+        }
 
         _locator.TryGetValue(data.GetType(), out var factory);
 
@@ -36,7 +38,8 @@ public class ViewLocator : IDataTemplate
             throw new InvalidOperationException($"No view registered for VM type: {data.GetType()}");
         }
 #endif
-        return factory?.Invoke() ?? new TextBlock { Text = string.Format(ResUI.MsgViewModelNotRegistered, data.GetType()) };
+        return factory?.Invoke() ?? new TextBlock
+            { Text = string.Format(ResUI.MsgViewModelNotRegistered, data.GetType()) };
     }
 
     public bool Match(object? data)
@@ -44,10 +47,15 @@ public class ViewLocator : IDataTemplate
         return data is ObservableObject;
     }
 
-    public void RegisterViewFactory<TViewModel>(Func<Control> factory) where TViewModel : class => _locator.Add(typeof(TViewModel), factory);
+    public void RegisterViewFactory<TViewModel>(Func<Control> factory) where TViewModel : class
+    {
+        _locator.Add(typeof(TViewModel), factory);
+    }
 
     public void RegisterViewFactory<TViewModel, TView>()
         where TViewModel : class
         where TView : Control, new()
-        => _locator.Add(typeof(TViewModel), () => new TView());
+    {
+        _locator.Add(typeof(TViewModel), () => new TView());
+    }
 }

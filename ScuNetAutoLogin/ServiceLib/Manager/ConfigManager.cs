@@ -6,9 +6,9 @@ namespace ServiceLib.Manager;
 public class ConfigManager
 {
     private static readonly Lazy<ConfigManager> _instance = new(() => new ConfigManager());
-    public static ConfigManager Instance => _instance.Value;
 
     private readonly SemaphoreSlim _fileLock = new(1, 1);
+    public static ConfigManager Instance => _instance.Value;
 
     public ConfigItem LoadConfig()
     {

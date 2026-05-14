@@ -1,43 +1,40 @@
+using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Sal.GUI.Resx;
-using System.Collections.ObjectModel;
 
 namespace Sal.GUI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    public partial bool IsPaneOpen { get; set; } = true;
-
-    public ObservableCollection<NavItem> NavItems { get; } = [];
-
-    [ObservableProperty]
-    public partial NavItem? SelectedNavItem { get; set; }
-
-    [ObservableProperty]
-    public partial ViewModelBase? CurrentPage { get; set; }
-
     public MainWindowViewModel()
     {
         NavItems.Add(new NavItem
         {
             Id = "config",
             Title = ResUI.NavConfig,
-            IconGeometry = ResolveIconGeometry("SemiIconSettingStroked")
+            IconGeometry = ResolveIconGeometry("SemiIconSettingStroked"),
         });
 
         NavItems.Add(new NavItem
         {
             Id = "login",
             Title = ResUI.NavLogin,
-            IconGeometry = ResolveIconGeometry("SemiIconUserStroked")
+            IconGeometry = ResolveIconGeometry("SemiIconUserStroked"),
         });
 
         SelectedNavItem = NavItems[0];
     }
+
+    [ObservableProperty] public partial bool IsPaneOpen { get; set; } = true;
+
+    public ObservableCollection<NavItem> NavItems { get; } = [];
+
+    [ObservableProperty] public partial NavItem? SelectedNavItem { get; set; }
+
+    [ObservableProperty] public partial ViewModelBase? CurrentPage { get; set; }
 
     private static Geometry? ResolveIconGeometry(string resourceKey)
     {
@@ -46,13 +43,16 @@ public partial class MainWindowViewModel : ViewModelBase
             return null;
         }
 
-        return Application.Current.TryGetResource(resourceKey, theme: null, out var resource)
+        return Application.Current.TryGetResource(resourceKey, null, out var resource)
             ? resource as Geometry
             : null;
     }
 
     [RelayCommand]
-    private void TogglePane() => IsPaneOpen = !IsPaneOpen;
+    private void TogglePane()
+    {
+        IsPaneOpen = !IsPaneOpen;
+    }
 
     public void UpdateLayout(double width)
     {
@@ -69,7 +69,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             "config" => new ConfigEditViewModel(),
             "login" => new LoginViewModel(),
-            _ => null
+            _ => null,
         };
     }
 }

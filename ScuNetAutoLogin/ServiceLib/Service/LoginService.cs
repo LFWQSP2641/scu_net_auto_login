@@ -1,15 +1,18 @@
+using System.Net.Http.Headers;
+using System.Web;
 using ServiceLib.Common;
 using ServiceLib.Data;
 using ServiceLib.Helper;
 using ServiceLib.Resx;
-using System.Net.Http.Headers;
 
 namespace ServiceLib.Service;
 
 public abstract class LoginException : Exception
 {
     protected LoginException(string message, Exception? innerException = null)
-        : base(message, innerException) { }
+        : base(message, innerException)
+    {
+    }
 
     public sealed class UnsupportedService(string service)
         : LoginException(string.Format(ResStr.ErrUnsupportedServiceFormat, service))
@@ -57,7 +60,7 @@ public class LoginService
     (
         new HttpClientHandler
         {
-            AllowAutoRedirect = false
+            AllowAutoRedirect = false,
         }
     );
 
@@ -70,7 +73,8 @@ public class LoginService
     private async Task PostLoginRequest(string queryString, AccountItem account)
     {
         var loginPostUrl = new Uri(new Uri(LoginConstants.MainUrl), LoginConstants.LoginPath);
-        var serviceCode = LoginConstants.ServiceCodeMap.GetValueOrDefault(account.Service) ?? throw new LoginException.UnsupportedService(account.Service);
+        var serviceCode = LoginConstants.ServiceCodeMap.GetValueOrDefault(account.Service) ??
+                          throw new LoginException.UnsupportedService(account.Service);
         var macAddress = GetMacFromQueryString(queryString) ?? throw new LoginException.MissingMacAddress();
 
         var postData = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -86,7 +90,7 @@ public class LoginService
         });
         var request = new HttpRequestMessage(HttpMethod.Post, loginPostUrl)
         {
-            Content = postData
+            Content = postData,
         };
         ApplyDefaultHeaders(request);
 
@@ -106,7 +110,9 @@ public class LoginService
         }
         else
         {
-            var snippet = responseContent.Length <= 200 ? responseContent : string.Concat(responseContent.AsSpan(0, 200), "...");
+            var snippet = responseContent.Length <= 200
+                ? responseContent
+                : string.Concat(responseContent.AsSpan(0, 200), "...");
             throw new LoginException.LoginFailed(snippet);
         }
     }
@@ -117,7 +123,8 @@ public class LoginService
         ApplyDefaultHeaders(request1);
         var response1 = await _httpClient.SendAsync(request1);
 
-        var redirect1Location = ResolveRedirectUrl(LoginConstants.MainUrl, response1.Headers.Location ?? throw new LoginException.MissingRedirectLocation("initial redirect"));
+        var redirect1Location = ResolveRedirectUrl(LoginConstants.MainUrl,
+            response1.Headers.Location ?? throw new LoginException.MissingRedirectLocation("initial redirect"));
 
         if (!redirect1Location.Contains("eportal/redirectortosuccess.jsp", StringComparison.OrdinalIgnoreCase))
         {
@@ -130,13 +137,14 @@ public class LoginService
         ApplyDefaultHeaders(request2, cookieHeader);
         var response2 = await _httpClient.SendAsync(request2);
 
-        var redirect2Location = ResolveRedirectUrl(redirect1Location, response2.Headers.Location ?? throw new LoginException.MissingRedirectLocation("second redirect"));
+        var redirect2Location = ResolveRedirectUrl(redirect1Location,
+            response2.Headers.Location ?? throw new LoginException.MissingRedirectLocation("second redirect"));
 
         if (redirect2Location.Contains("success.jsp", StringComparison.OrdinalIgnoreCase))
         {
             throw new LoginException.AlreadyLoggedIn();
         }
-        else if (!redirect2Location.Contains(LoginConstants.RedirectPortalHost, StringComparison.OrdinalIgnoreCase))
+        if (!redirect2Location.Contains(LoginConstants.RedirectPortalHost, StringComparison.OrdinalIgnoreCase))
         {
             throw new LoginException.UnexpectedRedirect(redirect2Location);
         }
@@ -158,10 +166,15 @@ public class LoginService
         foreach (var regex in LoginConstants.QueryStringExtractPatterns)
         {
             var match = regex.Match(normalizedHtml);
-            if (match is not { Success: true, Groups.Count: > 1 }) continue;
+            if (match is not { Success: true, Groups.Count: > 1 })
+            {
+                continue;
+            }
             var value = match.Groups[1].Value.Trim();
             if (!string.IsNullOrEmpty(value))
+            {
                 return value;
+            }
         }
 
         const string key = "/index.jsp?";
@@ -179,7 +192,7 @@ public class LoginService
             normalizedHtml.IndexOf('"', valueStart),
             normalizedHtml.IndexOf('\'', valueStart),
             normalizedHtml.IndexOf('<', valueStart),
-            normalizedHtml.IndexOf(' ', valueStart)
+            normalizedHtml.IndexOf(' ', valueStart),
         };
 
         var endIndex = endIndices
@@ -221,13 +234,18 @@ public class LoginService
         var cookieMap = ParseCookieHeader(existingCookieHeader);
 
         if (!headers.TryGetValues("Set-Cookie", out var setCookieHeaders))
+        {
             return string.Join("; ", cookieMap.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+        }
         foreach (var headerValue in setCookieHeaders)
         {
             var cookiePair = headerValue.Split(';')[0].Trim();
 
             var eqIndex = cookiePair.IndexOf('=');
-            if (eqIndex <= 0) continue;
+            if (eqIndex <= 0)
+            {
+                continue;
+            }
             var cookieName = cookiePair[..eqIndex].Trim();
             var cookieValue = cookiePair[(eqIndex + 1)..].Trim();
 
@@ -243,7 +261,9 @@ public class LoginService
     private static Dictionary<string, string> ParseCookieHeader(string cookieHeader)
     {
         if (string.IsNullOrWhiteSpace(cookieHeader))
+        {
             return new Dictionary<string, string>();
+        }
 
         return cookieHeader.Split(';')
             .Select(x => x.Split('='))
@@ -257,7 +277,7 @@ public class LoginService
 
     private static string? GetMacFromQueryString(string queryString)
     {
-        var parseQueryString = System.Web.HttpUtility.ParseQueryString(queryString);
+        var parseQueryString = HttpUtility.ParseQueryString(queryString);
         return parseQueryString.Get("mac");
     }
 }

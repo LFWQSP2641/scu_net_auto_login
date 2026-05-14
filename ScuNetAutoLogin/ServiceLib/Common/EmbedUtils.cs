@@ -8,7 +8,7 @@ public class EmbedUtils
     private static readonly ConcurrentDictionary<string, string> _dicEmbedCache = new();
 
     /// <summary>
-    /// Get embedded text resources
+    ///     Get embedded text resources
     /// </summary>
     /// <param name="res"></param>
     /// <returns></returns>

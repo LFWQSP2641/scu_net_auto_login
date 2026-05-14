@@ -1,10 +1,10 @@
+using System;
+using System.Threading.Tasks;
 using ConsoleAppFramework;
 using ServiceLib.Data;
 using ServiceLib.Helper;
 using ServiceLib.Resx;
 using ServiceLib.Service;
-using System;
-using System.Threading.Tasks;
 
 namespace Sal.GUI.CLICommand;
 
@@ -56,13 +56,13 @@ public class MyCommands
         bool enableHotspot = false,
         bool connectSCUNETWifi = false)
     {
-        var account = new AccountItem()
+        var account = new AccountItem
         {
             Username = username,
             Password = password,
             Service = service,
         };
-        var config = new ConfigItem()
+        var config = new ConfigItem
         {
             UserList = [account],
             RetryCount = retryCount,
@@ -94,7 +94,7 @@ public class MyCommands
     }
 
     /// <summary>
-    /// Start a Wi-Fi hotspot on the device.
+    ///     Start a Wi-Fi hotspot on the device.
     /// </summary>
     [Command("hotspot|h")]
     public async Task Hotspot()
@@ -111,7 +111,7 @@ public class MyCommands
     }
 
     /// <summary>
-    /// Connect to SCUNET Wi-Fi network.
+    ///     Connect to SCUNET Wi-Fi network.
     /// </summary>
     [Command("connect-scunet|c")]
     public async Task ConnectSCUNET()

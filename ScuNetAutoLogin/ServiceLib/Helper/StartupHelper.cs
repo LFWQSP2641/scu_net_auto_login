@@ -1,5 +1,5 @@
-using Microsoft.Win32;
 using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace ServiceLib.Helper;
 
@@ -44,8 +44,8 @@ public static class StartupHelper
                 return false;
             }
 
-            key.DeleteValue(StartupValueName, throwOnMissingValue: false);
-            key.DeleteValue(LegacyStartupValueName, throwOnMissingValue: false);
+            key.DeleteValue(StartupValueName, false);
+            key.DeleteValue(LegacyStartupValueName, false);
             return true;
         }
         catch
@@ -63,7 +63,7 @@ public static class StartupHelper
 
         try
         {
-            using var key = OpenRunKey(readOnly: true);
+            using var key = OpenRunKey(true);
             var value = key?.GetValue(StartupValueName) as string;
             return string.Equals(value, BuildStartupCommand(), StringComparison.OrdinalIgnoreCase);
         }
@@ -82,7 +82,9 @@ public static class StartupHelper
 
         if (!executablePath.EndsWith("Sal.GUI.exe", StringComparison.OrdinalIgnoreCase))
         {
-            executablePath = Path.Combine(Path.GetDirectoryName(executablePath) ?? AppDomain.CurrentDomain.BaseDirectory, "Sal.GUI.exe");
+            executablePath =
+                Path.Combine(Path.GetDirectoryName(executablePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+                    "Sal.GUI.exe");
         }
 
         return $"\"{executablePath}\" cli";
@@ -91,13 +93,13 @@ public static class StartupHelper
     [SupportedOSPlatform("windows")]
     private static RegistryKey OpenOrCreateRunKey()
     {
-        return Registry.CurrentUser.OpenSubKey(RunRegistryPath, writable: true)
-            ?? Registry.CurrentUser.CreateSubKey(RunRegistryPath, writable: true);
+        return Registry.CurrentUser.OpenSubKey(RunRegistryPath, true)
+               ?? Registry.CurrentUser.CreateSubKey(RunRegistryPath, true);
     }
 
     [SupportedOSPlatform("windows")]
     private static RegistryKey? OpenRunKey(bool readOnly = false)
     {
-        return Registry.CurrentUser.OpenSubKey(RunRegistryPath, writable: !readOnly);
+        return Registry.CurrentUser.OpenSubKey(RunRegistryPath, !readOnly);
     }
 }

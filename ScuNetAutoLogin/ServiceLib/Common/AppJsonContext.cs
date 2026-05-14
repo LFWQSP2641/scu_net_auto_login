@@ -1,5 +1,5 @@
-using ServiceLib.Data;
 using System.Text.Json.Serialization;
+using ServiceLib.Data;
 
 namespace ServiceLib.Common;
 

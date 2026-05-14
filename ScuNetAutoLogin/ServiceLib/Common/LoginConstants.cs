@@ -26,21 +26,22 @@ public partial class LoginConstants
 
     public static readonly Dictionary<string, string> ServiceCodeMap = new()
     {
-        {"chinatelecom", "%E7%94%B5%E4%BF%A1%E5%87%BA%E5%8F%A3"},
-        {"chinamobile", "%E7%A7%BB%E5%8A%A8%E5%87%BA%E5%8F%A3"},
-        {"chinaunicom", "%E8%81%94%E9%80%9A%E5%87%BA%E5%8F%A3"},
-        {"edunet", "internet"},
+        { "chinatelecom", "%E7%94%B5%E4%BF%A1%E5%87%BA%E5%8F%A3" },
+        { "chinamobile", "%E7%A7%BB%E5%8A%A8%E5%87%BA%E5%8F%A3" },
+        { "chinaunicom", "%E8%81%94%E9%80%9A%E5%87%BA%E5%8F%A3" },
+        { "edunet", "internet" },
     };
 
     public static readonly List<Regex> QueryStringExtractPatterns =
     [
         QueryStringExtractPatterns1(),
-        QueryStringExtractPatterns2()
+        QueryStringExtractPatterns2(),
     ];
 
     [GeneratedRegex(@"/index\.jsp\?([^'""#\s>]+)", RegexOptions.IgnoreCase)]
     private static partial Regex QueryStringExtractPatterns1();
 
-    [GeneratedRegex(@"top\.self\.location\.href\s*=\s*['""][^'"" ]*/index\.jsp\?([^'"" ]+ )['""]", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"top\.self\.location\.href\s*=\s*['""][^'"" ]*/index\.jsp\?([^'"" ]+ )['""]",
+        RegexOptions.IgnoreCase)]
     private static partial Regex QueryStringExtractPatterns2();
 }

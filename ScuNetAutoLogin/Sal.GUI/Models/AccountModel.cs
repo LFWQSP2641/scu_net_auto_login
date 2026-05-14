@@ -6,7 +6,8 @@ namespace Sal.GUI.Models;
 public partial class AccountModel : ObservableObject
 {
     public AccountModel()
-    { }
+    {
+    }
 
     public AccountModel(AccountItem accountItem)
     {
@@ -16,17 +17,13 @@ public partial class AccountModel : ObservableObject
         Service = accountItem.Service;
     }
 
-    [ObservableProperty]
-    public partial string Remark { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Remark { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    public partial string Username { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Username { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    public partial string Password { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Password { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    public partial string Service { get; set; } = string.Empty;
+    [ObservableProperty] public partial string Service { get; set; } = string.Empty;
 
     public AccountItem ToAccountItem()
     {
@@ -35,7 +32,7 @@ public partial class AccountModel : ObservableObject
             Remark = Remark,
             Username = Username,
             Password = Password,
-            Service = Service
+            Service = Service,
         };
     }
 }

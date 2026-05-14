@@ -1,5 +1,5 @@
-using ServiceLib.Common;
 using System.Diagnostics;
+using ServiceLib.Common;
 
 namespace ServiceLib.Helper;
 
@@ -7,7 +7,10 @@ public class PlatformHelper
 {
     public static async Task<bool> OpenHotspots()
     {
-        if (!Utils.IsWindows()) return false;
+        if (!Utils.IsWindows())
+        {
+            return false;
+        }
         var script = EmbedUtils.GetEmbedText(Global.HotspotScriptResourceName);
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
@@ -17,7 +20,7 @@ public class PlatformHelper
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
         };
         process.Start();
         var stdOutTask = process.StandardOutput.ReadToEndAsync();
@@ -55,7 +58,10 @@ public class PlatformHelper
 
     public static async Task<bool> ConnectSCUNETWifi()
     {
-        if (!Utils.IsWindows()) return false;
+        if (!Utils.IsWindows())
+        {
+            return false;
+        }
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
         {
@@ -64,7 +70,7 @@ public class PlatformHelper
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            CreateNoWindow = true
+            CreateNoWindow = true,
         };
         process.Start();
         var stdOutTask = process.StandardOutput.ReadToEndAsync();

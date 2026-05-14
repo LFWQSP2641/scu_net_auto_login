@@ -5,11 +5,14 @@ namespace ServiceLib.Manager;
 public class AppManager
 {
     private static readonly Lazy<AppManager> _instance = new(() => new AppManager());
-    public static AppManager Instance => _instance.Value;
 
     private ConfigItem _config = new();
+    public static AppManager Instance => _instance.Value;
 
-    public ConfigItem GetConfig() => _config;
+    public ConfigItem GetConfig()
+    {
+        return _config;
+    }
 
     public async Task SetConfig(ConfigItem config)
     {

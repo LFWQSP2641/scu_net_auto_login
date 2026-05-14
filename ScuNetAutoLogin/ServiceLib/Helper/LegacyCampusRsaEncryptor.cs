@@ -1,14 +1,15 @@
+using System.Globalization;
+using System.Numerics;
 using ServiceLib.Resx;
 
 namespace ServiceLib.Helper;
 
-using System.Globalization;
-using System.Numerics;
-
 public class LegacyCampusRsaEncryptor
 {
     private const string DefaultPublicExponentHex = "10001";
-    private const string DefaultModulusHex = "94dd2a8675fb779e6b9f7103698634cd400f27a154afa67af6166a43fc26417222a79506d34cacc7641946abda1785b7acf9910ad6a0978c91ec84d40b71d2891379af19ffb333e7517e390bd26ac312fe940c340466b4a5d4af1d65c3b5944078f96a1a51a5a53e4bc302818b7c9f63c4a1b07bd7d874cef1c3d4b2f5eb7871";
+
+    private const string DefaultModulusHex =
+        "94dd2a8675fb779e6b9f7103698634cd400f27a154afa67af6166a43fc26417222a79506d34cacc7641946abda1785b7acf9910ad6a0978c91ec84d40b71d2891379af19ffb333e7517e390bd26ac312fe940c340466b4a5d4af1d65c3b5944078f96a1a51a5a53e4bc302818b7c9f63c4a1b07bd7d874cef1c3d4b2f5eb7871";
 
     public static string EncryptPassword(string password, string mac)
     {
@@ -121,7 +122,8 @@ public class LegacyCampusRsaEncryptor
         for (var sourceIndex = hex.Length; sourceIndex > 0; sourceIndex -= 2)
         {
             var targetIndex = (hex.Length - sourceIndex) / 2;
-            bytes[targetIndex] = byte.Parse(hex.AsSpan(sourceIndex - 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            bytes[targetIndex] = byte.Parse(hex.AsSpan(sourceIndex - 2, 2), NumberStyles.HexNumber,
+                CultureInfo.InvariantCulture);
         }
 
         return new BigInteger(bytes);
@@ -134,7 +136,7 @@ public class LegacyCampusRsaEncryptor
             return 0;
         }
 
-        var bytes = value.ToByteArray(isUnsigned: true, isBigEndian: true);
+        var bytes = value.ToByteArray(true, true);
         var bits = (bytes.Length - 1) * 8;
         var mostSignificantByte = bytes[0];
 

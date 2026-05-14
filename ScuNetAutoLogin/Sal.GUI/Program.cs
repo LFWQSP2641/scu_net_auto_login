@@ -1,9 +1,9 @@
+using System;
+using System.Linq;
 using Avalonia;
 using ConsoleAppFramework;
 using Sal.GUI.CLICommand;
 using ServiceLib.Manager;
-using System;
-using System.Linq;
 
 namespace Sal.GUI;
 

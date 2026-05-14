@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Sal.GUI.Models;
@@ -5,31 +10,18 @@ using ServiceLib.Common;
 using ServiceLib.Data;
 using ServiceLib.Helper;
 using ServiceLib.Manager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sal.GUI.ViewModels;
 
 public partial class ConfigEditViewModel : ViewModelBase
 {
     private static readonly TimeSpan SaveCheckInterval = TimeSpan.FromMilliseconds(800);
-
-    public static IReadOnlyList<ServiceOption> ServiceOptions { get; } = ServiceOption.CreateDefaultList();
-
-    private readonly SemaphoreSlim _saveGate = new(1, 1);
     private readonly CancellationTokenSource _monitorCts = new();
     private readonly Task _monitorTask;
-    private string _lastSavedSnapshot;
+
+    private readonly SemaphoreSlim _saveGate = new(1, 1);
     private int _isClosing;
-
-    [ObservableProperty]
-    public partial ConfigModel Config { get; set; }
-
-    [ObservableProperty]
-    public partial AccountModel Account { get; set; }
+    private string _lastSavedSnapshot;
 
     public ConfigEditViewModel()
     {
@@ -44,7 +36,16 @@ public partial class ConfigEditViewModel : ViewModelBase
         _monitorTask = MonitorConfigChangesAsync(_monitorCts.Token);
     }
 
-    public static bool CanManageStartup() => Utils.IsWindows();
+    public static IReadOnlyList<ServiceOption> ServiceOptions { get; } = ServiceOption.CreateDefaultList();
+
+    [ObservableProperty] public partial ConfigModel Config { get; set; }
+
+    [ObservableProperty] public partial AccountModel Account { get; set; }
+
+    public static bool CanManageStartup()
+    {
+        return Utils.IsWindows();
+    }
 
     [RelayCommand(CanExecute = nameof(CanManageStartup))]
     public void AddWindowsStartup()
@@ -75,7 +76,7 @@ public partial class ConfigEditViewModel : ViewModelBase
             // Ignore
         }
 
-        await SaveIfChangedAsync(force: true);
+        await SaveIfChangedAsync(true);
 
         _monitorCts.Dispose();
         _saveGate.Dispose();
@@ -125,6 +126,6 @@ public partial class ConfigEditViewModel : ViewModelBase
 
     private static string CreateSnapshot(ConfigItem configItem)
     {
-        return JsonUtils.Serialize(configItem, indented: false);
+        return JsonUtils.Serialize(configItem, false);
     }
 }
