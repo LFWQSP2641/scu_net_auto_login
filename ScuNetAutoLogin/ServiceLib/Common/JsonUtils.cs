@@ -8,41 +8,41 @@ namespace ServiceLib.Common;
 
 public class JsonUtils
 {
-    private static readonly JsonSerializerOptions _defaultDeserializeOptions = new()
+    private static readonly JsonSerializerOptions DefaultDeserializeOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
     };
 
-    private static readonly JsonSerializerOptions _defaultSerializeOptions = new()
+    private static readonly JsonSerializerOptions DefaultSerializeOptions = new()
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    private static readonly JsonSerializerOptions _defaultSerializeNoIndentedOptions = new()
+    private static readonly JsonSerializerOptions DefaultSerializeNoIndentedOptions = new()
     {
         WriteIndented = false,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    private static readonly JsonSerializerOptions _nullValueSerializeOptions = new()
+    private static readonly JsonSerializerOptions NullValueSerializeOptions = new()
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    private static readonly JsonSerializerOptions _nullValueSerializeNoIndentedOptions = new()
+    private static readonly JsonSerializerOptions NullValueSerializeNoIndentedOptions = new()
     {
         WriteIndented = false,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    private static readonly JsonDocumentOptions _defaultDocumentOptions = new()
+    private static readonly JsonDocumentOptions DefaultDocumentOptions = new()
     {
         CommentHandling = JsonCommentHandling.Skip,
     };
@@ -114,7 +114,7 @@ public class JsonUtils
             {
                 return null;
             }
-            return JsonNode.Parse(strJson, null, _defaultDocumentOptions);
+            return JsonNode.Parse(strJson, null, DefaultDocumentOptions);
         }
         catch
         {
@@ -150,7 +150,7 @@ public class JsonUtils
             result = JsonSerializer.Serialize(obj, typeInfo);
             if (!options.WriteIndented || options.DefaultIgnoreCondition != JsonIgnoreCondition.WhenWritingNull)
             {
-                var node = JsonNode.Parse(result, documentOptions: _defaultDocumentOptions);
+                var node = JsonNode.Parse(result, documentOptions: DefaultDocumentOptions);
                 result = node?.ToJsonString(options) ?? result;
             }
         }
@@ -185,8 +185,8 @@ public class JsonUtils
         {
             result = JsonSerializer.Serialize(obj, typeInfo);
 
-            var effectiveOptions = options ?? _defaultSerializeOptions;
-            var node = JsonNode.Parse(result, documentOptions: _defaultDocumentOptions);
+            var effectiveOptions = options ?? DefaultSerializeOptions;
+            var node = JsonNode.Parse(result, documentOptions: DefaultDocumentOptions);
             result = node?.ToJsonString(effectiveOptions) ?? result;
         }
         catch
@@ -213,7 +213,7 @@ public class JsonUtils
                 return json;
             }
 
-            var node = JsonNode.Parse(json, documentOptions: _defaultDocumentOptions);
+            var node = JsonNode.Parse(json, documentOptions: DefaultDocumentOptions);
             return node?.ToJsonString(options) ?? json;
         }
         catch
@@ -244,7 +244,7 @@ public class JsonUtils
         try
         {
             var json = JsonSerializer.Serialize(obj, typeInfo);
-            return JsonNode.Parse(json, null, _defaultDocumentOptions);
+            return JsonNode.Parse(json, null, DefaultDocumentOptions);
         }
         catch
         {
@@ -256,10 +256,10 @@ public class JsonUtils
     {
         var options = (nullValue, indented) switch
         {
-            (true, true) => _nullValueSerializeOptions,
-            (true, false) => _nullValueSerializeNoIndentedOptions,
-            (false, true) => _defaultSerializeOptions,
-            _ => _defaultSerializeNoIndentedOptions,
+            (true, true) => NullValueSerializeOptions,
+            (true, false) => NullValueSerializeNoIndentedOptions,
+            (false, true) => DefaultSerializeOptions,
+            _ => DefaultSerializeNoIndentedOptions,
         };
         return options;
     }
