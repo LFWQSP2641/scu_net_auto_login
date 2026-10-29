@@ -41,7 +41,7 @@ public class MyCommands
     /// <param name="retryCount">-r, Number of retry attempts if login fails.</param>
     /// <param name="retryDelay">-d, Delay in seconds between retry attempts. (seconds)</param>
     /// <param name="initialDelay">-i, Initial delay in seconds before starting the login process. (seconds)</param>
-    /// <param name="enableHotspot">-h, Enable hotspot if login succeeds.</param>
+    /// <param name="enableHotspot">Enable hotspot if login succeeds.</param>
     /// <param name="connectSCUNETWifi">-c, Connect to SCUNET Wi-Fi before login.</param>
     [Command("login|l")]
     public async Task Login(
